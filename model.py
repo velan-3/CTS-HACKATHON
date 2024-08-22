@@ -55,7 +55,6 @@ Lab Test Details:
 - Blood Test Results: include blood test results (each point should be on a new line)
 - Liver and Kidney Test Results: include both liver function and kidney function tests, including bilirubin tests (each point should be on a new line)
 - Cholesterol Test Results: include cholesterol test results (each point should be on a new line)
-- Key Findings: Key findings from the test with causes (each point should be on a new line)
 - Explanation: Summarize the test results shortly  and their implications for the patient's health(each point should be on a new line)
 - Recommendations: Doctor's recommendations based on the test (each point should be on a new line)
 

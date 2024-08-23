@@ -7,3 +7,6 @@ langchain-community
 chromadb
 langchain-core
 PyMuPDF
+flask_cors
+flask
+langchain_huggingface

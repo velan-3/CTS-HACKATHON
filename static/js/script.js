@@ -106,9 +106,13 @@ document.getElementById('summarizeBtn').addEventListener('click', function () {
       pdfViewer.innerHTML = '';
 
       // Create and append the typewriter effect container
+      const summaryTile = document.createElement('div');
+      summaryTile.classList.add('full-width-tile');  // Ensure full-width-tile class is added
+      pdfViewer.appendChild(summaryTile);
+
       const summaryText = document.createElement('div');
       summaryText.classList.add('typewriter-text');
-      pdfViewer.appendChild(summaryText);
+      summaryTile.appendChild(summaryText);
       
       console.log("Typewriter function called");
 
@@ -151,7 +155,7 @@ function typeWriter(text, element, callback) {
     if (index < text.length) {
       element.innerHTML += text.charAt(index);
       index++;
-      setTimeout(type, 20); // Adjust speed here
+      setTimeout(type, 10); // Adjust speed here
     } else if (callback) {
       callback(); // Call the callback function after typing is complete
     }

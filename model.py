@@ -25,7 +25,7 @@ class Model:
         loader = PyMuPDFLoader(file_path)
         documents = loader.load()
         print("pdf loaded")
-        text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=300)
+        text_splitter = RecursiveCharacterTextSplitter(chunk_size=2000, chunk_overlap=300)
         texts = text_splitter.split_documents(documents)
         print("document splitted")
         persist_directory = 'db3'
@@ -43,34 +43,37 @@ class Model:
         persist_directory = 'db3'
         vectordb = Chroma(persist_directory=persist_directory, 
                     embedding_function=embeddings)
-        llm = HuggingFaceHub(repo_id='mistralai/Mistral-7B-Instruct-v0.2',model_kwargs={'temperature':0.1,'max_new_tokens':5000})
+        llm = HuggingFaceHub(repo_id='mistralai/Mistral-7B-Instruct-v0.2',model_kwargs={'temperature':0.1,'max_new_tokens':6000})
         global input
-        input = "Provide a detailed analysis of report for Blood tests, Liver function tests, Kidney function tests, Cholesterol tests."
-        
-        
+        input = "Provide a detailed analysis and summarization of complete Blood count, Liver tests, Kidney tests, Cholesterol tests from the report."
+
         prompt1 = ChatPromptTemplate.from_template("""
-You are a medical professional analyzing a patient's lab report. Your task is to extract the relevant test results and provide a concise analysis based on the provided context.
+You are a medical professional analyzing a patient's medical lab report. Your task is to extract the provided test results and provide a concise analysis based on the provided context.
 
-Provide the answer in the following format:
+Provide the SUmmarization in the following format:
 
-1. Lab Test Details:
+1.Patient Details:
+    - Patient Name, Age , Gender
+
+2. Lab Test Details:
     - Test Name: Specify all the tests names here. 
-2. Blood Test Results:
-    - Cover all relevant blood test results (e.g., Haemoglobin, PCV, MCV, MCH, MCHC, RDW, Platelets, Absolute Leucocyte Count) each on a new line.
+    
+3. Blood Test Results:
+    - Cover all relevant blood test results details (e.g., Haemoglobin, PCV, MCV, MCH, MCHC, RDW, Platelets, Absolute Leucocyte Count) each point should be on a new line.
 
-3. Liver Function Test Results:
-    - Feature all relevant liver function test results (e.g., Total Bilirubin, Bilirubin Direct, Bilirubin Indirect, ALT, AST, Alkaline Phosphate) each on a new line.
+4. Liver Function Test Results:
+    - Cover all relevant liver function test results details (e.g., Total Bilirubin, Bilirubin Direct, Bilirubin Indirect, ALT, AST, Alkaline Phosphate) each point on a new line.
 
-4. Kidney Function Test Results:
-    - Feature all relevant kidney function test results (e.g., Creatinine, Urea, Blood Urea Nitrogen, Calcium, Sodium, Potassium, Uric Acid, Chloride) each on a new line.
+5. Kidney Function Test Results:
+    - Cover all relevant kidney function test results details (e.g., Creatinine, Urea, Blood Urea Nitrogen, Calcium, Sodium, Potassium, Uric Acid, Chloride). Ensure each result is included and correctly interpreted. Each point should be on a new line.
 
-5. Cholesterol Test Results:
-    - Feature all relevant Cholesterol test results (e.g.,Total Cholesterol, HDL, LDL, Triglycerides).
+6. Cholesterol Test Results:
+    - Cover all relevant Cholesterol test results details (e.g., Total Cholesterol, HDL, LDL, Triglycerides).
 
-6. Explanation:
+7. Explanation:
     - Provide a brief summary of the test results and what they indicate about the patient's health (each point should be on a new line).
 
-7. Recommendations:
+8. Recommendations:
     - Provide medical advice or next steps based on the test results (each point should be on a new line).
 
 Context: {context}

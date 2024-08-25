@@ -81,51 +81,67 @@ document.getElementById('pdfUpload').addEventListener('change', function () {
 document.getElementById('summarizeBtn').addEventListener('click', function () {
   const pdfFile = document.getElementById('pdfUpload').files[0];
   const pdfViewer = document.getElementById('pdfViewer');
+  const loader = document.querySelector('.loader');  // Reference to the loader element
+
+  // Show the loader animation
+  loader.style.display = 'block';
 
   // Check if a PDF file has been uploaded
   if (pdfFile) {
-    const fileName = pdfFile?.name;
-    const summaryMessage = `Summarized report for ${fileName}:\n`;
+      const fileName = pdfFile.name;
+      const summaryMessage = `Summarized report for ${fileName}:\n`;
 
-    // Send a request to the Flask server to trigger summarization
-    fetch('/summarize', {
-      method: 'POST',
-      body: new FormData(document.getElementById('uploadForm')), // Include the PDF file in the request
-    })
-    .then(response => response.json())
-    .then(data => {
-      console.log("Details fetched");
+      // Send a request to the Flask server to trigger summarization
+      fetch('/summarize', {
+          method: 'POST',
+          body: new FormData(document.getElementById('uploadForm')), // Include the PDF file in the request
+      })
+      .then(response => response.json())
+      .then(data => {
+          console.log("Details fetched");
 
-      // Assume the server sends back the summarized content in 'data.summary'
-      const structuredSummary = data.summary;
+          // Assume the server sends back the summarized content in 'data.summary'
+          const structuredSummary = data.summary;
 
-      // Combine the summary message and structured summary into one string
-      const fullSummaryText = summaryMessage + structuredSummary;
+          // Combine the summary message and structured summary into one string
+          const fullSummaryText = summaryMessage + structuredSummary;
 
-      // Clear previous content in the PDF viewer
-      pdfViewer.innerHTML = '';
+          // Clear previous content in the PDF viewer
+          pdfViewer.innerHTML = '';
 
-      // Create and append the typewriter effect container
-      const summaryTile = document.createElement('div');
-      summaryTile.classList.add('full-width-tile');  // Ensure full-width-tile class is added
-      pdfViewer.appendChild(summaryTile);
+          // Create and append the typewriter effect container
+          const summaryTile = document.createElement('div');
+          summaryTile.classList.add('full-width-tile');  // Ensure full-width-tile class is added
+          pdfViewer.appendChild(summaryTile);
 
-      const summaryText = document.createElement('div');
-      summaryText.classList.add('typewriter-text');
-      summaryTile.appendChild(summaryText);
-      
-      console.log("Typewriter function called");
+          const summaryText = document.createElement('div');
+          summaryText.classList.add('typewriter-text');
+          summaryTile.appendChild(summaryText);
 
-      // Apply the typewriter effect to the combined text
-      typeWriter(fullSummaryText, summaryText, function(){
-        document.getElementById('downloadPdfBtn').style.display = 'block';
+          console.log("Typewriter function called");
+
+          // Hide the loader as we start generating the content
+          loader.style.display = 'none';
+
+          // Apply the typewriter effect to the combined text
+          typeWriter(fullSummaryText, summaryText, function(){
+              document.getElementById('downloadPdfBtn').style.display = 'block';
+          });
+      })
+      .catch(error => {
+          console.error('Error:', error);
+          
+          // Hide the loader in case of an error
+          loader.style.display = 'none';
       });
-    })
-    .catch(error => console.error('Error:', error));
   } else {
-    alert('Please upload a PDF file.');
+      alert('Please upload a PDF file.');
+
+      // Hide the loader if no file is uploaded
+      loader.style.display = 'none';
   }
 });
+
 
 // Event listener for the 'Download PDF' button
 document.getElementById('downloadPdfBtn').addEventListener('click', function () {

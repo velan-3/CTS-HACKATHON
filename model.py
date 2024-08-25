@@ -97,19 +97,33 @@ Question: {input}
         })
         text = dict(response)
         print(text)
-        # Pattern
-        pattern = re.compile(r'Answer:\s*(.*)', re.DOTALL)
-        extracted_wordings = []
-        for key, value in text.items():
-            if isinstance(value, str):  # Checking if value is a string
-                match = pattern.search(value)
-        if match:
-            extracted_wordings.append(match.group(1))  # Use group(1) since there's only one group
+        
+        # Pattern to extract the text after "Answer:"
+        answer_pattern = re.compile(r'Answer:\s*(.*)', re.DOTALL)
 
-        # Return or print the first extracted answer
+        # Pattern to extract the text after "Question" that ends with a period
+        question_pattern = re.compile(r'Question.*?\.\s*(.*)', re.DOTALL)
+
+        extracted_wordings = []
+    
+        for key, value in text.items():
+            if isinstance(value, str):  # Check if the value is a string
+            
+            # First, try to find the "Answer:" pattern
+                match = answer_pattern.search(value)
+                if match:
+                    extracted_wordings.append(match.group(1))
+                else:
+                # If "Answer:" is not found, try to find the "Question" pattern
+                    match = question_pattern.search(value)
+                    if match:
+                        extracted_wordings.append(match.group(1))
+
+    # Return or print the first extracted wording
         if extracted_wordings:
             return extracted_wordings[0]
         else:
-            print("No answers found.")
+            print("No answers or questions found.")
+        
         
 

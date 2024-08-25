@@ -97,6 +97,7 @@ Question: {input}
         })
         text = dict(response)
         print(text)
+        # Pattern
         pattern = re.compile(r'Answer:\s*(.*)', re.DOTALL)
         extracted_wordings = []
         for key, value in text.items():

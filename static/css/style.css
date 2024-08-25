@@ -1030,3 +1030,104 @@ canvas {
   height: 300px;
 }
 
+.chart-dropdown {
+  margin-bottom: 20px;
+  padding: 5px;
+  font-size: 16px;
+}
+
+.select-menu{
+  width: 300px;
+  margin: 20px 0;
+  position: relative; /* Add this to position the dropdown relative to the parent */
+  z-index: 100; /* Ensure it's above other content */
+}
+.select-menu .select-btn{
+  display: flex;
+  height: 50px;
+  background: #fff;
+  padding: 10px;
+  font-size: 16px;
+  font-weight: 500;
+  border-radius: 8px;
+  align-items: center;
+  cursor: pointer;
+  justify-content: space-between;
+  box-shadow: 0 0 5px rgba(0,0,0,0.1);
+  position: relative; /* Keep the button in normal flow */
+  z-index: 101; /* Ensure it's clickable above the dropdown */
+}
+.select-btn i{
+  font-size: 22px;
+  transition: 0.3s;
+}
+.select-menu.active .select-btn i{
+  transform: rotate(-180deg);
+}
+.select-menu .options{
+  position: absolute; /* Change to absolute to overlap other content */
+  top: 100%; /* Position just below the button */
+  left: 0;
+  right: 0;
+  padding: 10px;
+  margin-top: 5px;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  display: none;
+  z-index: 100; /* Make sure it's above the content */
+}
+.select-menu.active .options{
+  display: block;
+}
+.options .option{
+  display: flex;
+  height: 45px;
+  cursor: pointer;
+  padding: 0 16px;
+  border-radius: 8px;
+  align-items: center;
+  background: #fff;
+}
+.options .option:hover{
+  background: #F2F2F2;
+}
+.option i{
+  font-size: 22px;
+  margin-right: 12px;
+}
+.option .option-text{
+  font-size: 16px;
+  color: #333;
+}
+
+/* Chart Grid Styling */
+.chart-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-top: 30px;
+  /* Center the charts */
+}
+
+.chart-container {
+  flex: 1 1 300px; /* Maintain a minimum width for the charts */
+  max-width: 500px; /* Set a maximum width for the charts */
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  text-align: center; /* Center the text inside the chart container */
+}
+
+.chart-container h3 {
+  margin-bottom: 20px;
+  font-size: 20px;
+}
+
+.chart-grid.single-chart .chart-container {
+  max-width: 600px; /* Adjust the size of the single chart */
+  flex: 0 1 600px; /* Prevent it from stretching beyond this width */
+}
+
+

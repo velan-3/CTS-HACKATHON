@@ -232,28 +232,55 @@
         <h1>Visualization</h1>
         <p>This section will display visualizations of the medical data.</p>
 
+        <!-- Dropdown Menu for Selecting Chart Category -->
+        <div class="select-menu">
+          <div class="select-btn">
+            <span class="sBtn-text">Select your option</span>
+            <i class="bx bx-chevron-down"></i>
+          </div>
+
+          <ul class="options">
+            <li class="option" data-value="all">
+              <i class="bx bxs-grid"></i>
+              <span class="option-text">All</span>
+            </li>
+            <li class="option" data-value="heart">
+              <i class="bx bx-heart"></i>
+              <span class="option-text">Heart</span>
+            </li>
+            <li class="option" data-value="kidney">
+              <i class="bx bxs-droplet"></i>
+              <span class="option-text">Kidney</span>
+            </li>
+            <li class="option" data-value="liver">
+              <i class="bx bx-dna"></i>
+              <span class="option-text">Liver</span>
+            </li>
+          </ul>
+        </div>
+
         <!-- Chart Grid Container -->
         <div class="chart-grid">
           <!-- Line Chart -->
-          <div class="chart-container">
+          <div class="chart-container" id="lineChartContainer">
             <h3>Line Chart</h3>
             <canvas id="lineChart"></canvas>
           </div>
 
           <!-- Bar Chart -->
-          <div class="chart-container">
+          <div class="chart-container" id="barChartContainer">
             <h3>Bar Chart</h3>
             <canvas id="barChart"></canvas>
           </div>
 
           <!-- Clustered Bar Chart -->
-          <div class="chart-container">
+          <div class="chart-container" id="clusteredBarChartContainer">
             <h3>Clustered Bar Chart</h3>
             <canvas id="clusteredBarChart"></canvas>
           </div>
 
           <!-- Stacked Bar Chart -->
-          <div class="chart-container">
+          <div class="chart-container" id="stackedBarChartContainer">
             <h3>Stacked Bar Chart</h3>
             <canvas id="stackedBarChart"></canvas>
           </div>
@@ -294,6 +321,7 @@
 
     <!-- JavaScript -->
     <script src="static/js/script.js"></script>
+    <script src="static/js/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>

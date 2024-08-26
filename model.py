@@ -50,7 +50,7 @@ class Model:
         prompt1 = ChatPromptTemplate.from_template("""
 You are a medical professional analyzing a patient's medical lab report. Your task is to extract the provided test results and provide a concise analysis based on the provided context.
 
-Provide the SUmmarization in the following format:
+Provide the summarization in the following format:
 
 1.Patient Details:
     - Patient Name, Age , Gender

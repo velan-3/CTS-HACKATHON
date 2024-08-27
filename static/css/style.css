@@ -1105,14 +1105,14 @@ canvas {
 .chart-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 20px;
+  gap: 20px; /* Space between the charts */
   margin-top: 30px;
-  /* Center the charts */
+  justify-content: center; /* Center the charts horizontally */
 }
 
 .chart-container {
-  flex: 1 1 300px; /* Maintain a minimum width for the charts */
-  max-width: 500px; /* Set a maximum width for the charts */
+  flex: 1 1 calc(33.333% - 20px); /* Three charts per row, accounting for the gap */
+  max-width: calc(33.333% - 20px); /* Ensure the charts fit in three columns */
   background: #fff;
   padding: 20px;
   border-radius: 8px;
@@ -1129,5 +1129,3 @@ canvas {
   max-width: 600px; /* Adjust the size of the single chart */
   flex: 0 1 600px; /* Prevent it from stretching beyond this width */
 }
-
-

@@ -124,10 +124,10 @@ const optionMenu = document.querySelector(".select-menu"),
       sBtn_text = optionMenu.querySelector(".sBtn-text"),
       chartGrid = document.querySelector(".chart-grid"),
       charts = {
-          all: ["lineChartContainer", "barChartContainer", "clusteredBarChartContainer", "stackedBarChartContainer"],
-          heart: ["lineChartContainer"],
+          blood: ["barChartContainer", "barChartContainer"],
+          liver: ["lineChartContainer"],
           kidney: ["barChartContainer"],
-          liver: ["stackedBarChartContainer"]
+          cholestrol: ["stackedBarChartContainer"]
       };
 
 selectBtn.addEventListener("click", () => optionMenu.classList.toggle("active"));

@@ -15,7 +15,6 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 class Model:
     
     def __init__(self):
-        # Set the Hugging Face API key
         os.environ['HUGGINGFACEHUB_API_TOKEN'] = "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"
         self.summarization()
         #self.preprocesspdf()
@@ -25,7 +24,7 @@ class Model:
         loader = PyMuPDFLoader(file_path)
         documents = loader.load()
         print("pdf loaded")
-        text_splitter = RecursiveCharacterTextSplitter(chunk_size=2000, chunk_overlap=300)
+        text_splitter = RecursiveCharacterTextSplitter(chunk_size=5000, chunk_overlap=300)
         texts = text_splitter.split_documents(documents)
         print("document splitted")
         persist_directory = 'db3'
@@ -68,7 +67,7 @@ Provide the summarization in the following format:
     - Cover all relevant kidney function test results details (e.g., Creatinine, Urea, Blood Urea Nitrogen, Calcium, Sodium, Potassium, Uric Acid, Chloride). Ensure each result is included and correctly interpreted. Each point should be on a new line.
 
 6. Cholesterol Test Results:
-    - Cover all relevant Cholesterol test results details (e.g., Total Cholesterol, HDL, LDL, Triglycerides).
+    - Cover all relevant Cholesterol test results details (e.g., Total Cholesterol, Triglycerides, HDL, LDL).
 
 7. Explanation:
     - Provide a brief summary of the test results and what they indicate about the patient's health (each point should be on a new line).
@@ -98,28 +97,22 @@ Question: {input}
         text = dict(response)
         print(text)
         
-        # Pattern to extract the text after "Answer:"
         answer_pattern = re.compile(r'Answer:\s*(.*)', re.DOTALL)
 
-        # Pattern to extract the text after "Question" that ends with a period
         question_pattern = re.compile(r'Question.*?\.\s*(.*)', re.DOTALL)
 
         extracted_wordings = []
     
         for key, value in text.items():
-            if isinstance(value, str):  # Check if the value is a string
+            if isinstance(value, str):  
             
-            # First, try to find the "Answer:" pattern
                 match = answer_pattern.search(value)
                 if match:
                     extracted_wordings.append(match.group(1))
                 else:
-                # If "Answer:" is not found, try to find the "Question" pattern
                     match = question_pattern.search(value)
                     if match:
                         extracted_wordings.append(match.group(1))
-
-    # Return or print the first extracted wording
         if extracted_wordings:
             return extracted_wordings[0]
         else:

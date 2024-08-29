@@ -1,93 +1,175 @@
-// Initialize Charts (examples below for each type)
+
+/*
 const chartsConfig = [
-  { id: 'bloodBarChart1', type: 'bar', label: 'Blood Bar Chart 1', data: [10, 20, 15, 25, 30, 22], bgColor: 'rgba(255, 99, 132, 0.7)' },
-  { id: 'bloodBarChart2', type: 'bar', label: 'Blood Bar Chart 2', data: [12, 18, 14, 22, 28, 26], bgColor: 'rgba(54, 162, 235, 0.7)' },
-  { id: 'bloodBarChart3', type: 'bar', label: 'Blood Bar Chart 3', data: [16, 24, 19, 30, 34, 32], bgColor: 'rgba(75, 192, 192, 0.7)' },
-  { id: 'bloodPieChart', type: 'pie', label: 'Blood Pie Chart', data: [50, 30, 20], bgColor: ['rgba(255, 99, 132, 0.7)', 'rgba(54, 162, 235, 0.7)', 'rgba(75, 192, 192, 0.7)'] },
+  // Blood Test Results (CBC)
+  {
+    id: 'cbcChart',
+    type: 'bar',
+    label: 'CBC Results',
+    data: [11.2, 33.5, 3.85, 87.2, 29.2, 33.5, 15, 6810, 270000],
+    bgColor: 'rgba(54, 162, 235, 0.7)',
+    labels: ['Hemoglobin', 'PCV', 'RBC', 'MCV', 'MCH', 'MCHC', 'RDW', 'TLC', 'Platelets'],
+    yMin: 0,
+    yMax: 300000,
+  },
+  {
+    id: 'dlcChart',
+    type: 'bar',
+    label: 'DLC Percentages',
+    data: [58.6, 24.8, 6.6, 9.6, 0.4],
+    bgColor: ['rgba(255, 99, 132, 0.7)', 'rgba(54, 162, 235, 0.7)', 'rgba(75, 192, 192, 0.7)', 'rgba(255, 206, 86, 0.7)', 'rgba(153, 102, 255, 0.7)'],
+    labels: ['Neutrophils', 'Lymphocytes', 'Eosinophils', 'Monocytes', 'Basophils'],
+    yMin: 0,
+    yMax: 100,
+  },
+  {
+    id: 'nlrChart',
+    type: 'line',
+    label: 'NLR',
+    data: [2.36],
+    bgColor: 'rgba(255, 206, 86, 0.7)',
+    labels: ['NLR'],
+    yMin: 0,
+    yMax: 5,
+  },
 
-  { id: 'liverBarChart1', type: 'bar', label: 'Liver Bar Chart 1', data: [14, 25, 18, 28, 32, 29], bgColor: 'rgba(153, 102, 255, 0.7)' },
-  { id: 'liverBarChart2', type: 'bar', label: 'Liver Bar Chart 2', data: [15, 26, 19, 30, 34, 32], bgColor: 'rgba(255, 206, 86, 0.7)' },
-  { id: 'liverBarChart3', type: 'bar', label: 'Liver Bar Chart 3', data: [18, 29, 22, 33, 38, 35], bgColor: 'rgba(255, 159, 64, 0.7)' },
-  { id: 'liverPieChart', type: 'pie', label: 'Liver Pie Chart', data: [40, 30, 30], bgColor: ['rgba(153, 102, 255, 0.7)', 'rgba(255, 206, 86, 0.7)', 'rgba(255, 159, 64, 0.7)'] },
+  // Liver Function Test (LFT) Results
+  {
+    id: 'lftBarChart',
+    type: 'bar',
+    label: 'LFT Results',
+    data: [0.55, 0.27, 0.28, 12.3, 21.5, 52.6, 5.96, 3.59, 2.37, 1.51],
+    bgColor: 'rgba(153, 102, 255, 0.7)',
+    labels: ['Total Bilirubin', 'Direct Bilirubin', 'Indirect Bilirubin', 'ALT', 'AST', 'Alkaline Phosphatase', 'Total Protein', 'Albumin', 'Globulin', 'A/G Ratio'],
+    yMin: 0,
+    yMax: 100,
+  },
+  {
+    id: 'lftRadarChart',
+    type: 'radar',
+    label: 'LFT Status',
+    data: [0.55, 0.27, 0.28, 12.3, 21.5, 52.6, 5.96, 3.59, 2.37, 1.51],
+    bgColor: 'rgba(255, 159, 64, 0.7)',
+    labels: ['Total Bilirubin', 'Direct Bilirubin', 'Indirect Bilirubin', 'ALT', 'AST', 'Alkaline Phosphatase', 'Total Protein', 'Albumin', 'Globulin', 'A/G Ratio'],
+    yMin: 0,
+    yMax: 100,
+  },
 
-  { id: 'kidneyBarChart1', type: 'bar', label: 'Kidney Bar Chart 1', data: [20, 30, 25, 35, 40, 37], bgColor: 'rgba(54, 162, 235, 0.7)' },
-  { id: 'kidneyBarChart2', type: 'bar', label: 'Kidney Bar Chart 2', data: [22, 32, 27, 38, 43, 40], bgColor: 'rgba(255, 99, 132, 0.7)' },
-  { id: 'kidneyBarChart3', type: 'bar', label: 'Kidney Bar Chart 3', data: [25, 35, 30, 42, 48, 44], bgColor: 'rgba(75, 192, 192, 0.7)' },
-  { id: 'kidneyPieChart', type: 'pie', label: 'Kidney Pie Chart', data: [35, 40, 25], bgColor: ['rgba(54, 162, 235, 0.7)', 'rgba(255, 99, 132, 0.7)', 'rgba(75, 192, 192, 0.7)'] },
+  // Kidney Function Test (KFT) Results
+  {
+    id: 'kftBarChart',
+    type: 'bar',
+    label: 'KFT Results',
+    data: [1.13, 44.1, 20.6, 0.74, 9.79, 3.76, 134, 4.7, 104],
+    bgColor: 'rgba(75, 192, 192, 0.7)',
+    labels: ['Creatinine', 'Urea', 'BUN', 'Uric Acid', 'Calcium', 'Phosphorus', 'Sodium', 'Potassium', 'Chloride'],
+    yMin: 0,
+    yMax: 150,
+  },
+  {
+    id: 'kftViolinChart',
+    type: 'line', // Note: Actual Violin Plot is complex, use line chart for simplicity here.
+    label: 'KFT Distribution',
+    data: [1.13, 44.1, 20.6, 0.74, 9.79, 3.76, 134, 4.7, 104],
+    bgColor: 'rgba(54, 162, 235, 0.7)',
+    labels: ['Creatinine', 'Urea', 'BUN', 'Uric Acid', 'Calcium', 'Phosphorus', 'Sodium', 'Potassium', 'Chloride'],
+    yMin: 0,
+    yMax: 150,
+  },
 
-  { id: 'cholesterolBarChart1', type: 'bar', label: 'Cholesterol Bar Chart 1', data: [18, 28, 23, 33, 38, 35], bgColor: 'rgba(255, 159, 64, 0.7)' },
-  { id: 'cholesterolBarChart2', type: 'bar', label: 'Cholesterol Bar Chart 2', data: [20, 30, 25, 35, 40, 37], bgColor: 'rgba(153, 102, 255, 0.7)' },
-  { id: 'cholesterolBarChart3', type: 'bar', label: 'Cholesterol Bar Chart 3', data: [22, 32, 27, 38, 43, 40], bgColor: 'rgba(54, 162, 235, 0.7)' },
-  { id: 'cholesterolPieChart', type: 'pie', label: 'Cholesterol Pie Chart', data: [30, 35, 35], bgColor: ['rgba(255, 159, 64, 0.7)', 'rgba(153, 102, 255, 0.7)', 'rgba(54, 162, 235, 0.7)'] }
+  // Cholesterol Test Results
+  {
+    id: 'cholesterolPieChart',
+    type: 'pie',
+    label: 'Cholesterol Distribution',
+    data: [127, 48, 60.76, 18.74],
+    bgColor: ['rgba(255, 99, 132, 0.7)', 'rgba(54, 162, 235, 0.7)', 'rgba(255, 206, 86, 0.7)', 'rgba(153, 102, 255, 0.7)'],
+    labels: ['Total Cholesterol', 'HDL', 'LDL', 'VLDL'],
+  },
+  {
+    id: 'cholesterolBarChart',
+    type: 'bar',
+    label: 'Cholesterol Test Results',
+    data: [127, 94, 48, 80, 60.76, 18.74],
+    bgColor: 'rgba(153, 102, 255, 0.7)',
+    labels: ['Total Cholesterol', 'Triglycerides', 'HDL', 'Non-HDL', 'LDL', 'VLDL'],
+    yMin: 0,
+    yMax: 200,
+  },
+  {
+    id: 'cholesterolLineChart',
+    type: 'line',
+    label: 'Cholesterol/HDL Ratio & Atherogenic Index',
+    data: [2.67, 0.01],
+    bgColor: 'rgba(255, 159, 64, 0.7)',
+    labels: ['Cholesterol/HDL Ratio', 'Atherogenic Index'],
+    yMin: 0,
+    yMax: 5,
+  },
 ];
 
-// Function to create charts
+// Initialize Charts
 chartsConfig.forEach(config => {
-  new Chart(document.getElementById(config.id).getContext('2d'), {
+  const ctx = document.getElementById(config.id).getContext('2d');
+  new Chart(ctx, {
     type: config.type,
     data: {
-      labels: config.type === 'pie' ? ['Category 1', 'Category 2', 'Category 3'] : ['January', 'February', 'March', 'April', 'May', 'June'],
+      labels: config.labels,
       datasets: [{
         label: config.label,
         data: config.data,
         backgroundColor: config.bgColor,
-        borderColor: config.type === 'pie' ? [] : config.bgColor,
-        borderWidth: config.type === 'pie' ? 0 : 1
+        borderColor: 'rgba(0, 0, 0, 0.1)',
+        borderWidth: 1,
       }]
     },
     options: {
-      responsive: true,
-      scales: config.type === 'pie' ? {} : {
+      scales: {
         y: {
-          beginAtZero: true
+          min: config.yMin,
+          max: config.yMax,
         }
       }
     }
   });
 });
 
-// Dropdown functionality
-const optionMenu = document.querySelector(".select-menu"),
-      selectBtn = optionMenu.querySelector(".select-btn"),
-      options = optionMenu.querySelectorAll(".option"),
-      sBtn_text = optionMenu.querySelector(".sBtn-text"),
-      chartGrid = document.querySelector(".chart-grid"),
-      charts = {
-          blood: ["bloodBarChart1Container", "bloodBarChart2Container", "bloodBarChart3Container", "bloodPieChartContainer"],
-          liver: ["liverBarChart1Container", "liverBarChart2Container", "liverBarChart3Container", "liverPieChartContainer"],
-          kidney: ["kidneyBarChart1Container", "kidneyBarChart2Container", "kidneyBarChart3Container", "kidneyPieChartContainer"],
-          cholesterol: ["cholesterolBarChart1Container", "cholesterolBarChart2Container", "cholesterolBarChart3Container", "cholesterolPieChartContainer"]
-      };
+*/
 
-// Hide all charts by default
-document.querySelectorAll(".chart-container").forEach(chart => {
-    chart.style.display = "none";
-});
+async function fetchChartsConfig() {
+  const response = await fetch('/charts-config');
+  return await response.json();
+}
 
-selectBtn.addEventListener("click", () => optionMenu.classList.toggle("active"));
+async function renderCharts() {
+  const chartsConfig = await fetchChartsConfig();
+  
+  chartsConfig.forEach(config => {
+      const ctx = document.getElementById(config.id).getContext('2d');
+      new Chart(ctx, {
+          type: config.type,
+          data: {
+              labels: config.labels,
+              datasets: [{
+                  label: config.label,
+                  data: config.data,
+                  backgroundColor: config.bgColor,
+                  borderColor: config.borderColor || 'transparent',
+                  borderWidth: config.borderWidth || 1,
+              }]
+          },
+          options: {
+              scales: {
+                  y: {
+                      min: config.yMin,
+                      max: config.yMax,
+                      beginAtZero: true
+                  }
+              },
+              responsive: true
+          }
+      });
+  });
+}
 
-options.forEach(option => {
-    option.addEventListener("click", () => {
-        let selectedOption = option.dataset.value;
-        sBtn_text.innerText = option.querySelector(".option-text").innerText;
-
-        optionMenu.classList.remove("active");
-
-        // Reset chart visibility
-        document.querySelectorAll(".chart-container").forEach(chart => {
-            chart.style.display = "none";
-        });
-
-        // Show the selected charts
-        charts[selectedOption].forEach(chartId => {
-            document.getElementById(chartId).style.display = "block";
-        });
-
-        // Adjust layout if only one chart is displayed
-        if (charts[selectedOption].length === 1) {
-            chartGrid.classList.add("single-chart");
-        } else {
-            chartGrid.classList.remove("single-chart");
-        }
-    });
-});
+renderCharts();

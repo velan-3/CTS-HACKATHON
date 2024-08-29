@@ -232,108 +232,74 @@
         <h1>Visualization</h1>
         <p>This section will display visualizations of the medical data.</p>
       
-        <!-- Dropdown Menu for Selecting Chart Category -->
-        <div class="select-menu">
-          <div class="select-btn">
-            <span class="sBtn-text">Select your option</span>
-            <i class="bx bx-chevron-down"></i>
-          </div>
-      
-          <ul class="options">
-            <li class="option" data-value="blood">
-              <i class="bx bxs-grid"></i>
-              <span class="option-text">Blood</span>
-            </li>
-            <li class="option" data-value="liver">
-              <i class="bx bx-heart"></i>
-              <span class="option-text">Liver</span>
-            </li>
-            <li class="option" data-value="kidney">
-              <i class="bx bxs-droplet"></i>
-              <span class="option-text">Kidney</span>
-            </li>
-            <li class="option" data-value="cholesterol">
-              <i class="bx bx-dna"></i>
-              <span class="option-text">Cholesterol</span>
-            </li>
-          </ul>
-        </div>
-      
-        <!-- Chart Grid Container -->
-        <div class="chart-grid">
-          <!-- Blood Section Charts -->
-          <div class="chart-container" id="bloodPieChartContainer">
-            <h3>Blood Pie Chart</h3>
-            <canvas id="bloodPieChart"></canvas>
-          </div>
-          <div class="chart-container" id="bloodBarChart1Container">
-            <h3>Blood Bar Chart 1</h3>
-            <canvas id="bloodBarChart1"></canvas>
-          </div>
-          <div class="chart-container" id="bloodBarChart2Container">
-            <h3>Blood Bar Chart 2</h3>
-            <canvas id="bloodBarChart2"></canvas>
-          </div>
-          <div class="chart-container" id="bloodBarChart3Container">
-            <h3>Blood Bar Chart 3</h3>
-            <canvas id="bloodBarChart3"></canvas>
-          </div>
-          
-          <!-- Liver Section Charts -->
-          <div class="chart-container" id="liverPieChartContainer">
-            <h3>Liver Pie Chart</h3>
-            <canvas id="liverPieChart"></canvas>
-          </div>
-          <div class="chart-container" id="liverBarChart1Container">
-            <h3>Liver Bar Chart 1</h3>
-            <canvas id="liverBarChart1"></canvas>
-          </div>
-          <div class="chart-container" id="liverBarChart2Container">
-            <h3>Liver Bar Chart 2</h3>
-            <canvas id="liverBarChart2"></canvas>
-          </div>
-          <div class="chart-container" id="liverBarChart3Container">
-            <h3>Liver Bar Chart 3</h3>
-            <canvas id="liverBarChart3"></canvas>
-          </div>
-      
-          <!-- Kidney Section Charts -->
-          <div class="chart-container" id="kidneyPieChartContainer">
-            <h3>Kidney Pie Chart</h3>
-            <canvas id="kidneyPieChart"></canvas>
-          </div>
-          <div class="chart-container" id="kidneyBarChart1Container">
-            <h3>Kidney Bar Chart 1</h3>
-            <canvas id="kidneyBarChart1"></canvas>
-          </div>
-          <div class="chart-container" id="kidneyBarChart2Container">
-            <h3>Kidney Bar Chart 2</h3>
-            <canvas id="kidneyBarChart2"></canvas>
-          </div>
-          <div class="chart-container" id="kidneyBarChart3Container">
-            <h3>Kidney Bar Chart 3</h3>
-            <canvas id="kidneyBarChart3"></canvas>
-          </div>
-      
-          <!-- Cholesterol Section Charts -->
-          <div class="chart-container" id="cholesterolPieChartContainer">
-            <h3>Cholesterol Pie Chart</h3>
-            <canvas id="cholesterolPieChart"></canvas>
-          </div>
-          <div class="chart-container" id="cholesterolBarChart1Container">
-            <h3>Cholesterol Bar Chart 1</h3>
-            <canvas id="cholesterolBarChart1"></canvas>
-          </div>
-          <div class="chart-container" id="cholesterolBarChart2Container">
-            <h3>Cholesterol Bar Chart 2</h3>
-            <canvas id="cholesterolBarChart2"></canvas>
-          </div>
-          <div class="chart-container" id="cholesterolBarChart3Container">
-            <h3>Cholesterol Bar Chart 3</h3>
-            <canvas id="cholesterolBarChart3"></canvas>
+        <!-- Blood Test Results Section -->
+        <div class="section">
+          <h2 class="section-title">Blood Test Results</h2>
+          <div class="chart-grid">
+            <div class="chart-container" id="cbcChartContainer">
+              <h3>Complete Blood Count (CBC) Results</h3>
+              <canvas id="cbcChart"></canvas>
+            </div>
+            <div class="chart-container" id="dlcChartContainer">
+              <h3>Differential Leukocyte Count (DLC) - Percentages</h3>
+              <canvas id="dlcChart"></canvas>
+            </div>
+            <div class="chart-container" id="nlrChartContainer">
+              <h3>Neutrophil Lymphocyte Ratio (NLR)</h3>
+              <canvas id="nlrChart"></canvas>
+            </div>
           </div>
         </div>
-      </div>      
+      
+        <!-- Liver Function Test Results Section -->
+        <div class="section">
+          <h2 class="section-title">Liver Function Test Results</h2>
+          <div class="chart-grid">
+            <div class="chart-container" id="lftBarChartContainer">
+              <h3>Liver Function Test (LFT) Results</h3>
+              <canvas id="lftBarChart"></canvas>
+            </div>
+            <div class="chart-container" id="lftRadarChartContainer">
+              <h3>LFT - Overall Status</h3>
+              <canvas id="lftRadarChart"></canvas>
+            </div>
+          </div>
+        </div>
+      
+        <!-- Kidney Function Test Results Section -->
+        <div class="section">
+          <h2 class="section-title">Kidney Function Test Results</h2>
+          <div class="chart-grid">
+            <div class="chart-container" id="kftBarChartContainer">
+              <h3>Kidney Function Test (KFT) Results</h3>
+              <canvas id="kftBarChart"></canvas>
+            </div>
+            <div class="chart-container" id="kftViolinChartContainer">
+              <h3>KFT - Distribution of Key Parameters</h3>
+              <canvas id="kftViolinChart"></canvas>
+            </div>
+          </div>
+        </div>
+      
+        <!-- Cholesterol Test Results Section -->
+        <div class="section">
+          <h2 class="section-title">Cholesterol Test Results</h2>
+          <div class="chart-grid">
+            <div class="chart-container" id="cholesterolPieChartContainer">
+              <h3>Cholesterol Distribution</h3>
+              <canvas id="cholesterolPieChart"></canvas>
+            </div>
+            <div class="chart-container" id="cholesterolBarChartContainer">
+              <h3>Cholesterol Test Results</h3>
+              <canvas id="cholesterolBarChart"></canvas>
+            </div>
+            <div class="chart-container" id="cholesterolLineChartContainer">
+              <h3>Cholesterol/HDL Ratio & Atherogenic Index</h3>
+              <canvas id="cholesterolLineChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>               
 
       <div id="extraction" class="content_section">
         <h1>Extraction</h1>

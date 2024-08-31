@@ -83,6 +83,10 @@ document.getElementById('summarizeBtn').addEventListener('click', function () {
   const pdfViewer = document.getElementById('pdfViewer');
   const loader = document.querySelector('.loader');  // Reference to the loader element
 
+  // Hide the modal when "Summarize" is clicked
+  modal.style.display = "none";
+  pdfViewer.innerHTML = '';
+
   // Show the loader animation
   loader.style.display = 'block';
 
@@ -160,7 +164,6 @@ document.getElementById('visualizationLink').addEventListener('click', function(
   renderCharts();
 });
 
-// async function fetchChartsConfig() {
 //   const response = await fetch('/charts-config');
 //   return await response.json();
 // }

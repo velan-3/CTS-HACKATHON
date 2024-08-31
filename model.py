@@ -58,7 +58,7 @@ Provide the summarization in the following format:
     - Test Name: Specify all the tests names here. 
     
 3. Blood Test Results:
-    - Cover all relevant blood test results details (e.g., Haemoglobin, PCV, MCV, MCH, MCHC, RDW, Platelets, Absolute Leucocyte Count) each point should be on a new line.
+    - Cover all relevant blood test results details (e.g., Haemoglobin, PCV, MCV, MCH, MCHC, RDW, Platelets, Differential Leucocyte Count, NLR) each point should be on a new line.
 
 4. Liver Function Test Results:
     - Cover all relevant liver function test results details (e.g., Total Bilirubin, Bilirubin Direct, Bilirubin Indirect, ALT, AST, Alkaline Phosphate) each point on a new line.

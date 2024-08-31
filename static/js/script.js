@@ -149,6 +149,54 @@ document.getElementById('downloadPdfBtn').addEventListener('click', function () 
   downloadPDF(summaryElement);
 });
 
+document.getElementById('visualizationLink').addEventListener('click', function(event) {
+  event.preventDefault(); // Prevent default link behavior
+  
+  // Show the chart container
+  //document.getElementById('chartContainer').style.display = 'block';
+  
+  // Render the chart
+  console.log("Executed")
+  renderCharts();
+});
+
+// async function fetchChartsConfig() {
+//   const response = await fetch('/charts-config');
+//   return await response.json();
+// }
+
+// async function renderCharts() {
+//   const chartsConfig = await fetchChartsConfig();
+  
+//   chartsConfig.forEach(config => {
+//       const ctx = document.getElementById(config.id).getContext('2d');
+//       new Chart(ctx, {
+//           type: config.type,
+//           data: {
+//               labels: config.labels,
+//               datasets: [{
+//                   label: config.label,
+//                   data: config.data,
+//                   backgroundColor: config.bgColor,
+//                   borderColor: config.borderColor || 'transparent',
+//                   borderWidth: config.borderWidth || 1,
+//               }]
+//           },
+//           options: {
+//               scales: {
+//                   y: {
+//                       min: config.yMin,
+//                       max: config.yMax,
+//                       beginAtZero: true
+//                   }
+//               },
+//               responsive: true
+//           }
+//       });
+//   });
+// }
+
+
 // Function to handle PDF download
 function downloadPDF(element) {
   const options = {

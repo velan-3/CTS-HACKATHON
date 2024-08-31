@@ -10,10 +10,11 @@ app.config["UPLOAD_FOLDER"] = "./upload"
 summaries_cache = {}
 global uploaded_filename
 uploaded_filename = None
-global blood_test_results, liver_function_test_results, kidney_function_test_result, cholesterol_test_results
+global blood_test_results, liver_function_test_results
+global cholesterol_test_results, kidney_test_results
 blood_test_results = {}
+kidney_test_results = {}
 liver_function_test_results = {}
-kidney_function_test_results = {}
 cholesterol_test_results = {}
 
 
@@ -50,7 +51,8 @@ def upload_file():
 @app.route("/summarize", methods=["POST"])
 def summarize_pdf():
     global uploaded_filename
-    global blood_test_results, liver_function_test_results, kidney_function_test_result, cholesterol_test_results
+    global blood_test_results, liver_function_test_results
+    global cholesterol_test_results, kidney_test_results
     if uploaded_filename in summaries_cache:
         print("Returning cached summary")
         summary = summaries_cache[uploaded_filename]
@@ -86,47 +88,48 @@ def summarize_pdf():
 
     lab_tests = {
         "blood": {
-            "haemoglobin": "Haemoglobin",
-            "PCV": "Packed Cell Volume (PCV)",
-            "RBC": " Red Blood Cell (RBC) count",
-            "MCV": "Mean Corpuscular Volume (MCV)",
-            "MCH": "Mean Corpuscular Hemoglobin (MCH)",
-            "MCHC": "Mean Corpuscular Hemoglobin Concentration (MCHC)",
-            "RDW": "Red Blood Cell Distribution Width (RDW)",
-            "TLC": "Total Leukocyte Count (TLC)",
-            "platelet": "Platelet Count",
-            "neutrophils": "Neutrophils",
-            "lymphocytes": "Lymphocytes",
-            "eosinophils": "Eosinophils",
-            "monocytes": "Monocytes",
-            "basophils": "Basophils",
+        "haemoglobin": r"Haemoglobin",
+        "PCV": r"Packed Cell Volume \(PCV\)",
+        "RBC": r"Red Blood Cell \(RBC\) count",
+        "MCV": r"Mean Corpuscular Volume \(MCV\)",
+        "MCH": r"Mean Corpuscular Hemoglobin \(MCH\)",
+        "MCHC": r"Mean Corpuscular Hemoglobin Concentration \(MCHC\)",
+        "RDW": r"Red Blood Cell Distribution Width \(RDW\)",
+        "TLC": r"Total Leukocyte Count \(TLC\)",
+        "platelet": r"Platelet count",
+        "neutrophils": r"Neutrophils",
+        "lymphocytes": r"Lymphocytes",
+        "eosinophils": r"Eosinophils",
+        "monocytes": r"Monocytes",
+        "basophils": r"Basophils",
+        "nlr": r"Neutrophil lymphocyte ratio \(NLR\)"
         },
         "liver": {
-            "bilirubin_total": "Total Bilirubin",
-            "bilirubin_direct": "Direct Bilirubin",
-            "bilirubin_indirect": "Indirect Bilirubin",
-            "ALT": "Alanine Aminotransferase (ALT)",
-            "AST": "Aspartate Aminotransferase (AST)",
-            "Alk": "Alkaline Phosphatase",
-            "Protein": "Total Protein",
-            "Albumin": "Albumin",
-            "Globulin": "Globulin",
+            "bilirubin_total": r"Total Bilirubin",
+            "bilirubin_direct": r"Bilirubin Conjugated \(Direct\)",
+            "bilirubin_indirect": r"Bilirubin Indirect",
+            "ALT": r"Alanine Aminotransferase \(ALT\)",
+            "AST": r"Aspartate Aminotransferase \(AST\)",
+            "Alk": r"Alkaline Phosphatase",
+            "Protein": r"Total Protein",
+            "Albumin": r"Albumin",
+            "Globulin": r"Globulin",
         },
         "kidney": {
-            "creatinine": "Creatinine",
-            "urea": "Urea",
-            "blood_urea": "Blood Urea Nitrogen",
-            "calcium": "Calcium",
-            "phosphorus": "Phosphorus, Inorganic",
-            "sodium": "Sodium",
-            "potassium": "Potassium",
-            "chloride": "Chloride",
+            "creatinine": r"Creatinine",
+            "urea": r"Urea",
+            "blood_urea": r"Blood Urea Nitrogen",
+            "calcium": r"Calcium",
+            "phosphorus": r"Phosphorus, Inorganic",
+            "sodium": r"Sodium",
+            "potassium": r"Potassium",
+            "chloride": r"Chloride",
         },
         "cholesterol": {
-            "total_cholesterol": "Total Cholesterol",
-            "hdl": "HDL Cholesterol",
-            "ldl": "LDL Cholesterol",
-            "triglycerides": "Triglycerides",
+            "total_cholesterol": r"Total Cholesterol",
+            "hdl": r"HDL Cholesterol",
+            "ldl": r"LDL Cholesterol",
+            "triglycerides": r"Triglycerides",
         },
     }
 
@@ -157,7 +160,7 @@ def summarize_pdf():
                     section_text, lab_tests["liver"]
                 )
             elif category == "kidney":
-                kidney_function_test_results = extract_lab_results(
+                kidney_test_results = extract_lab_results(
                     section_text, lab_tests["kidney"]
                 )
             elif category == "cholesterol":
@@ -166,7 +169,7 @@ def summarize_pdf():
                 )
     print(blood_test_results)
     print(liver_function_test_results)
-    print(kidney_function_test_results)
+    print(kidney_test_results)
     print(cholesterol_test_results)
 
     return jsonify({"summary": summary}), 200
@@ -174,23 +177,30 @@ def summarize_pdf():
 
 @app.route('/charts-config')
 def charts_config():
+    global blood_test_results, liver_function_test_results
+    global cholesterol_test_results, kidney_test_results
+    print(blood_test_results)
+    print(liver_function_test_results)
+    print(kidney_test_results)
+    print(cholesterol_test_results)
     charts_data = [
         # Blood Test Results (CBC)
         {
             'id': 'cbcChart',
             'type': 'bar',
             'label': 'CBC Results',
-            'data': [11.2, 33.5, 3.85, 87.2, 29.2, 33.5, 15, 6810, 270000],
+            'data': [11.2, 12.5, blood_test_results["RBC"], blood_test_results["MCV"], blood_test_results["MCH"], blood_test_results["MCHC"], blood_test_results["TLC"]
+],
             'bgColor': 'rgba(54, 162, 235, 0.7)',
-            'labels': ['Hemoglobin', 'PCV', 'RBC', 'MCV', 'MCH', 'MCHC', 'RDW', 'TLC', 'Platelets'],
+            'labels': ["Haemoglobin", "PCV", "RBC", "MCV", "MCH", "MCHC", "TLC"],
             'yMin': 0,
-            'yMax': 300000,
+            'yMax': 100,
         },
         {
             'id': 'dlcChart',
             'type': 'bar',
             'label': 'DLC Percentages',
-            'data': [58.6, 24.8, 6.6, 9.6, 0.4],
+            'data': [blood_test_results["neutrophils"], blood_test_results["lymphocytes"], blood_test_results["eosinophils"], blood_test_results["monocytes"], blood_test_results["basophils"]],
             'bgColor': ['rgba(255, 99, 132, 0.7)', 'rgba(54, 162, 235, 0.7)', 'rgba(75, 192, 192, 0.7)', 'rgba(255, 206, 86, 0.7)', 'rgba(153, 102, 255, 0.7)'],
             'labels': ['Neutrophils', 'Lymphocytes', 'Eosinophils', 'Monocytes', 'Basophils'],
             'yMin': 0,
@@ -200,7 +210,7 @@ def charts_config():
             'id': 'nlrChart',
             'type': 'line',
             'label': 'NLR',
-            'data': [2.36],
+            'data': [blood_test_results["nlr"]],
             'bgColor': 'rgba(255, 206, 86, 0.7)',
             'labels': ['NLR'],
             'yMin': 0,
@@ -211,19 +221,19 @@ def charts_config():
             'id': 'lftBarChart',
             'type': 'bar',
             'label': 'LFT Results',
-            'data': [0.55, 0.27, 0.28, 12.3, 21.5, 52.6, 5.96, 3.59, 2.37, 1.51],
+            'data': [liver_function_test_results["bilirubin_total"], liver_function_test_results["bilirubin_direct"], liver_function_test_results["bilirubin_indirect"], liver_function_test_results["ALT"], liver_function_test_results["AST"], liver_function_test_results["Alk"],liver_function_test_results["Albumin"],liver_function_test_results["Globulin"] ],
             'bgColor': 'rgba(153, 102, 255, 0.7)',
-            'labels': ['Total Bilirubin', 'Direct Bilirubin', 'Indirect Bilirubin', 'ALT', 'AST', 'Alkaline Phosphatase', 'Total Protein', 'Albumin', 'Globulin', 'A/G Ratio'],
+            'labels': ['Total Bilirubin', 'Direct Bilirubin', 'Indirect Bilirubin', 'ALT', 'AST', 'Alkaline Phosphatase', 'Albumin', 'Globulin'],
             'yMin': 0,
-            'yMax': 100,
+            'yMax': 60,
         },
         {
             'id': 'lftRadarChart',
             'type': 'radar',
             'label': 'LFT Status',
-            'data': [0.55, 0.27, 0.28, 12.3, 21.5, 52.6, 5.96, 3.59, 2.37, 1.51],
+            'data': [liver_function_test_results["bilirubin_total"], liver_function_test_results["bilirubin_direct"], liver_function_test_results["bilirubin_indirect"], liver_function_test_results["ALT"], liver_function_test_results["AST"], liver_function_test_results["Alk"],liver_function_test_results["Albumin"],liver_function_test_results["Globulin"] ],
             'bgColor': 'rgba(255, 159, 64, 0.7)',
-            'labels': ['Total Bilirubin', 'Direct Bilirubin', 'Indirect Bilirubin', 'ALT', 'AST', 'Alkaline Phosphatase', 'Total Protein', 'Albumin', 'Globulin', 'A/G Ratio'],
+            'labels': ['Total Bilirubin', 'Direct Bilirubin', 'Indirect Bilirubin', 'ALT', 'AST', 'Alkaline Phosphatase', 'Albumin', 'Globulin'],
             'yMin': 0,
             'yMax': 100,
         },
@@ -232,9 +242,9 @@ def charts_config():
             'id': 'kftBarChart',
             'type': 'bar',
             'label': 'KFT Results',
-            'data': [1.13, 44.1, 20.6, 0.74, 9.79, 3.76, 134, 4.7, 104],
+            'data': [kidney_test_results['creatinine'], kidney_test_results['urea'], kidney_test_results['blood_urea'], kidney_test_results['calcium'], kidney_test_results['phosphorus'], kidney_test_results['sodium'], kidney_test_results['potassium'], kidney_test_results['chloride'] ],
             'bgColor': 'rgba(75, 192, 192, 0.7)',
-            'labels': ['Creatinine', 'Urea', 'BUN', 'Uric Acid', 'Calcium', 'Phosphorus', 'Sodium', 'Potassium', 'Chloride'],
+            'labels': ['Creatinine', 'Urea', 'BUN', 'Calcium', 'Phosphorus', 'Sodium', 'Potassium', 'Chloride'],
             'yMin': 0,
             'yMax': 150,
         },
@@ -242,9 +252,9 @@ def charts_config():
             'id': 'kftViolinChart',
             'type': 'line',  # Note: Actual Violin Plot is complex, use line chart for simplicity here.
             'label': 'KFT Distribution',
-            'data': [1.13, 44.1, 20.6, 0.74, 9.79, 3.76, 134, 4.7, 104],
+            'data': [kidney_test_results['creatinine'], kidney_test_results['urea'], kidney_test_results['blood_urea'], kidney_test_results['calcium'], kidney_test_results['phosphorus'], kidney_test_results['sodium'], kidney_test_results['potassium'], kidney_test_results['chloride']],
             'bgColor': 'rgba(54, 162, 235, 0.7)',
-            'labels': ['Creatinine', 'Urea', 'BUN', 'Uric Acid', 'Calcium', 'Phosphorus', 'Sodium', 'Potassium', 'Chloride'],
+            'labels': ['Creatinine', 'Urea', 'BUN', 'Calcium', 'Phosphorus', 'Sodium', 'Potassium', 'Chloride'],
             'yMin': 0,
             'yMax': 150,
         },
@@ -253,17 +263,17 @@ def charts_config():
             'id': 'cholesterolPieChart',
             'type': 'pie',
             'label': 'Cholesterol Distribution',
-            'data': [127, 48, 60.76, 18.74],
+            'data': [cholesterol_test_results['total_cholesterol'], cholesterol_test_results['hdl'], cholesterol_test_results['ldl'], cholesterol_test_results['triglycerides'] ],
             'bgColor': ['rgba(255, 99, 132, 0.7)', 'rgba(54, 162, 235, 0.7)', 'rgba(255, 206, 86, 0.7)', 'rgba(153, 102, 255, 0.7)'],
-            'labels': ['Total Cholesterol', 'HDL', 'LDL', 'VLDL'],
+            'labels': ['Total Cholesterol', 'HDL', 'LDL', 'Triglycerides'],
         },
         {
             'id': 'cholesterolBarChart',
             'type': 'bar',
             'label': 'Cholesterol Test Results',
-            'data': [127, 94, 48, 80, 60.76, 18.74],
+            'data': [cholesterol_test_results['total_cholesterol'], cholesterol_test_results['hdl'], cholesterol_test_results['ldl'], cholesterol_test_results['triglycerides']],
             'bgColor': 'rgba(153, 102, 255, 0.7)',
-            'labels': ['Total Cholesterol', 'Triglycerides', 'HDL', 'Non-HDL', 'LDL', 'VLDL'],
+            'labels': ['Total Cholesterol', 'HDL', 'LDL','Triglycerides'],
             'yMin': 0,
             'yMax': 200,
         },
@@ -279,129 +289,6 @@ def charts_config():
         }
     ]
     return jsonify(charts_data)
-    global blood_test_results, liver_function_test_results, kidney_function_test_result, cholesterol_test_results
-    # Example data for each chart, typically you'd retrieve this from a database
-    chart_data = {
-        "cbcChart": {
-            "labels": [
-                "Hemoglobin",
-                "PCV",
-                "RBC",
-                "MCV",
-                "MCH",
-                "MCHC",
-                "RDW",
-                "TLC",
-                "Platelets",
-            ],
-            "data": [blood_test_results["haemoglobin"],blood_test_results["PCV"],blood_test_results["RBC"],blood_test_results["MCV"],blood_test_results["MCHC"],blood_test_results["RDW"],blood_test_results["TLC"],blood_test_results["platelet"]],
-            "yMin": 0,
-            "yMax": 300000,
-        },
-        "dlcChart": {
-            "labels": [
-                "Neutrophils",
-                "Lymphocytes",
-                "Eosinophils",
-                "Monocytes",
-                "Basophils",
-            ],
-            "data": [58.6, 24.8, 6.6, 9.6, 0.4],
-            "yMin": 0,
-            "yMax": 100,
-        },
-        "nlrChart": {"labels": ["NLR"], "data": [2.36], "yMin": 0, "yMax": 5},
-        "lftBarChart": {
-            "labels": [
-                "Total Bilirubin",
-                "Direct Bilirubin",
-                "Indirect Bilirubin",
-                "ALT",
-                "AST",
-                "Alkaline Phosphatase",
-                "Total Protein",
-                "Albumin",
-                "Globulin",
-                "A/G Ratio",
-            ],
-            "data": [0.55, 0.27, 0.28, 12.3, 21.5, 52.6, 5.96, 3.59, 2.37, 1.51],
-            "yMin": 0,
-            "yMax": 100,
-        },
-        "lftRadarChart": {
-            "labels": [
-                "Total Bilirubin",
-                "Direct Bilirubin",
-                "Indirect Bilirubin",
-                "ALT",
-                "AST",
-                "Alkaline Phosphatase",
-                "Total Protein",
-                "Albumin",
-                "Globulin",
-                "A/G Ratio",
-            ],
-            "data": [0.55, 0.27, 0.28, 12.3, 21.5, 52.6, 5.96, 3.59, 2.37, 1.51],
-            "yMin": 0,
-            "yMax": 100,
-        },
-        "kftBarChart": {
-            "labels": [
-                "Creatinine",
-                "Urea",
-                "BUN",
-                "Uric Acid",
-                "Calcium",
-                "Phosphorus",
-                "Sodium",
-                "Potassium",
-                "Chloride",
-            ],
-            "data": [1.13, 44.1, 20.6, 0.74, 9.79, 3.76, 134, 4.7, 104],
-            "yMin": 0,
-            "yMax": 150,
-        },
-        "kftViolinChart": {
-            "labels": [
-                "Creatinine",
-                "Urea",
-                "BUN",
-                "Uric Acid",
-                "Calcium",
-                "Phosphorus",
-                "Sodium",
-                "Potassium",
-                "Chloride",
-            ],
-            "data": [1.13, 44.1, 20.6, 0.74, 9.79, 3.76, 134, 4.7, 104],
-            "yMin": 0,
-            "yMax": 150,
-        },
-        "cholesterolPieChart": {
-            "labels": ["Total Cholesterol", "HDL", "LDL", "VLDL"],
-            "data": [127, 48, 60.76, 18.74],
-        },
-        "cholesterolBarChart": {
-            "labels": [
-                "Total Cholesterol",
-                "Triglycerides",
-                "HDL",
-                "Non-HDL",
-                "LDL",
-                "VLDL",
-            ],
-            "data": [127, 94, 48, 80, 60.76, 18.74],
-            "yMin": 0,
-            "yMax": 200,
-        },
-        "cholesterolLineChart": {
-            "labels": ["Cholesterol/HDL Ratio", "Atherogenic Index"],
-            "data": [2.67, 0.01],
-            "yMin": 0,
-            "yMax": 5,
-        },
-    }
-    return jsonify(chart_data)
 
 
 if __name__ == "__main__":

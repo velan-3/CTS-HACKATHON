@@ -169,41 +169,6 @@ document.getElementById('visualizationLink').addEventListener('click', function(
   renderCharts();
 });
 
-//   const response = await fetch('/charts-config');
-//   return await response.json();
-// }
-
-// async function renderCharts() {
-//   const chartsConfig = await fetchChartsConfig();
-  
-//   chartsConfig.forEach(config => {
-//       const ctx = document.getElementById(config.id).getContext('2d');
-//       new Chart(ctx, {
-//           type: config.type,
-//           data: {
-//               labels: config.labels,
-//               datasets: [{
-//                   label: config.label,
-//                   data: config.data,
-//                   backgroundColor: config.bgColor,
-//                   borderColor: config.borderColor || 'transparent',
-//                   borderWidth: config.borderWidth || 1,
-//               }]
-//           },
-//           options: {
-//               scales: {
-//                   y: {
-//                       min: config.yMin,
-//                       max: config.yMax,
-//                       beginAtZero: true
-//                   }
-//               },
-//               responsive: true
-//           }
-//       });
-//   });
-// }
-
 
 // Function to handle PDF download
 function downloadPDF(element) {
@@ -436,3 +401,62 @@ document.getElementById("searchBtn").addEventListener("click", function () {
   // Display the results div
   resultsDiv.style.display = "block";
 });
+
+// Prediction section
+function changePrediction() {
+  const predictions = [
+      { 
+          organ: 'Lung', 
+          disease: 'Pneumonia', 
+          image: 'static/images/lung-male.jpg', 
+          description: 'Pneumonia is an infection that inflames the air sacs in one or both lungs, which may fill with fluid.' 
+      },
+      { 
+          organ: 'Heart', 
+          disease: 'Myocardial Infarction', 
+          image: 'static/images/heart-male.jpg', 
+          description: 'Myocardial infarction, commonly known as a heart attack, occurs when blood flow decreases or stops to a part of the heart, causing damage to the heart muscle.' 
+      },
+      { 
+          organ: 'Brain', 
+          disease: 'Stroke', 
+          image: 'static/images/brain-male.jpg', 
+          description: 'A stroke occurs when the blood supply to part of the brain is interrupted or reduced, preventing brain tissue from getting oxygen and nutrients.' 
+      },
+      { 
+          organ: 'Lung', 
+          disease: 'Pneumonia', 
+          image: 'static/images/lung-female.jpg', 
+          description: 'Pneumonia is an infection that inflames the air sacs in one or both lungs, which may fill with fluid.' 
+      },
+      { 
+          organ: 'Heart', 
+          disease: 'Myocardial Infarction', 
+          image: 'static/images/heart-female.jpg', 
+          description: 'Myocardial infarction, commonly known as a heart attack, occurs when blood flow decreases or stops to a part of the heart, causing damage to the heart muscle.' 
+      },
+      { 
+          organ: 'Brain', 
+          disease: 'Stroke', 
+          image: 'static/images/brain-female.jpg', 
+          description: 'A stroke occurs when the blood supply to part of the brain is interrupted or reduced, preventing brain tissue from getting oxygen and nutrients.' 
+      }
+  ];
+
+  // Randomly select a prediction
+  const randomIndex = Math.floor(Math.random() * predictions.length);
+  const prediction = predictions[randomIndex];
+
+  // Update the image and prediction details
+  document.getElementById('prediction-image').src = prediction.image;
+  document.getElementById('predicted-organ').innerText = `Predicted Organ: ${prediction.organ}`;
+  document.getElementById('predicted-disease').innerText = `Predicted Disease: ${prediction.disease}`;
+  document.getElementById('disease-description').innerText = prediction.description;
+}
+
+// Add an event listener to the button to trigger the function
+document.getElementById('changePredictionBtn').addEventListener('click', changePrediction);
+
+
+
+

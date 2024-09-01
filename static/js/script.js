@@ -383,23 +383,43 @@ function displayPDF(pdfData) {
 
 // JavaScript to handle the search functionality
 document.getElementById("searchBtn").addEventListener("click", function () {
-  var query = document.getElementById("searchQuery").value;
-  var resultsDiv = document.getElementById("searchResults");
 
-  // Clear previous result
-  resultsDiv.innerHTML = "";
+  const searchQuery = document.getElementById('searchQuery').value;
 
-  // Add a container for the typewriter effect
-  var resultText = document.createElement("p");
-  resultText.classList.add("typewriter-text"); // Add class for styling
-  resultsDiv.appendChild(resultText);
 
-  var sample = "The patient is a 30-year-old male. The blood test results indicate a Hemoglobin level of 15.00 g/dL, Packed Cell Volume (PCV) of 45.00%, RBC count of 4.50 mill/mm3, Mean Corpuscular Volume (MCV) of 90.00 fL, Mean Corpuscular Hemoglobin (MCH) of 32.00 pg, Mean Corpuscular Hemoglobin Concentration (MCHC) of 33.00 g/dL, and Red Cell Distribution Width (RDW) of 14.00%.The liver and kidney panel results show a Creatinine level of 118 mg/dL, Estimated Glomerular Filtration Rate (eGFR) of >59 mL/min/1.73m2, Urea level of 9.34 mg/dL, Urea Nitrogen in Blood of 10 mg/dL, Uric Acid level of 11.0 mg/dL, AST (SGOT) level of 21.0 U/L, and ALT (SGPT) level of 5.00 U/L. The eGFR falls under the G1 category (normal) according to the KDIGO Guideline 2012. The BUN/Creatinine ratio is 10.The key findings from the tests reveal that the patient's kidney function is normal, as indicated by the eGFR value. However, the liver enzyme levels, specifically AST and ALT, are slightly elevated. This could suggest liver damage or inflammation. Further investigation and clinical correlation are required to determine the cause and implications for the patient's health.Based on the test results, the doctor may recommend additional tests to evaluate liver function more thoroughly, such as a liver ultrasound or a liver biopsy. The patient should also be advised to avoid alcohol consumption and maintain a healthy diet to support liver health. Regular follow-up appointments and monitoring of liver enzyme levels are essential to assess the progression or resolution of liver damage."
-  // Start typewriter effect
-  typeWriter("Summary of " + query + ": " + sample, resultText);
+    // Send the search query to the Flask backend
+    fetch('/process-query', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ query: searchQuery })
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Display the result in the searchResults div
+        var resultsDiv = document.getElementById("searchResults");
 
-  // Display the results div
-  resultsDiv.style.display = "block";
+        // Clear previous result
+        resultsDiv.innerHTML = "";
+
+        // Add a container for the typewriter effect
+        var resultText = document.createElement("p");
+        resultText.classList.add("typewriter-text"); // Add class for styling
+        resultsDiv.appendChild(resultText);
+
+        const answer = data.result; 
+        // Start typewriter effect
+        typeWriter(answer, resultText);
+
+        // Display the results div
+        resultsDiv.style.display = "block";
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+  
+  
 });
 
 // Prediction section

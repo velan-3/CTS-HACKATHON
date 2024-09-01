@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, jsonify, send_file, session
 from werkzeug.utils import secure_filename
 from model import Model
-import os, re
+import os, re, shutil
 from flask_cors import CORS
 
 app = Flask(__name__)
@@ -26,6 +26,8 @@ def index():
 @app.route("/upload", methods=["POST"])
 def upload_file():
     global uploaded_filename
+    delete_all_files_in_folder("./upload")
+    delete_all_files_in_folder("./db")
     if "pdf" not in request.files:
         return jsonify({"error": "No file part"}), 400
 
@@ -46,6 +48,16 @@ def upload_file():
         )
 
     return jsonify({"error": "Invalid file type. Only PDFs are allowed."}), 400
+def delete_all_files_in_folder(folder_path):
+    # Use glob to get all files in the folder
+    if os.path.exists(folder_path):
+        # Remove all contents of the folder, including subdirectories
+        for item in os.listdir(folder_path):
+            item_path = os.path.join(folder_path, item)
+            if os.path.isdir(item_path):
+                shutil.rmtree(item_path)  # Remove the directory and all its contents
+            elif os.path.isfile(item_path):
+                os.remove(item_path)  # Remove the file
 
 
 @app.route("/summarize", methods=["POST"])
@@ -299,6 +311,14 @@ def charts_config():
     ]
     return jsonify(charts_data)
 
+@app.route('/process-query', methods=['POST'])
+def process_query():
+    data = request.json
+    search_query = data.get('query', '')
+    model = Model()
+    response = model.Extraction(search_query)  
+    # Placeholder response
+    return jsonify({'result': response})
 
 if __name__ == "__main__":
     app.run(debug=False)

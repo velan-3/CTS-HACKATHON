@@ -18,6 +18,7 @@ class Model:
         os.environ['HUGGINGFACEHUB_API_TOKEN'] = "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"
         #self.summarization()
         self.embedding  = None
+        self.vectordbl = None
         #self.preprocesspdf()
         
     def pdfprocessing(self,pdf_filename):
@@ -28,7 +29,7 @@ class Model:
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=5000, chunk_overlap=300)
         texts = text_splitter.split_documents(documents)
         print("document splitted")
-        persist_directory = 'db3'
+        persist_directory = 'db'
         #global embedding
         self.embedding = HuggingFaceEmbeddings()
         print("Embedding done")
@@ -41,9 +42,9 @@ class Model:
     def summarization(self):
         #global embedding
         #embeddings = HuggingFaceEmbeddings()
-        print('embedding done')
-        persist_directory = 'db3'
-        vectordb = Chroma(persist_directory=persist_directory, 
+        print('Loading db')
+        persist_directory = 'db'
+        self.vectordbl = Chroma(persist_directory=persist_directory, 
                     embedding_function=self.embedding)
         llm = HuggingFaceHub(repo_id='mistralai/Mistral-7B-Instruct-v0.2',model_kwargs={'temperature':0.1,'max_new_tokens':6000})
         global input
@@ -84,7 +85,7 @@ Question: {input}
 """)
 
         chain = create_stuff_documents_chain(llm=llm,prompt=prompt1)
-        retriever = vectordb.as_retriever()
+        retriever = self.vectordbl.as_retriever()
         global retreival_chain
         retreival_chain = create_retrieval_chain(
             retriever,
@@ -121,5 +122,50 @@ Question: {input}
         else:
             print("No answers or questions found.")
         
+    def Extraction(self,query):
+        print('Loading db')
+        persist_directory = 'db'
+        print("Query")
+        llm = HuggingFaceHub(repo_id='mistralai/Mistral-7B-Instruct-v0.2',model_kwargs={'temperature':0.1,'max_new_tokens':6000})
+        input = query
+        self.embedding = HuggingFaceEmbeddings()
+        vectordb = Chroma(persist_directory=persist_directory, 
+                    embedding_function=self.embedding)
+        prompt = ChatPromptTemplate.from_template("""
+        You are a medical professional analyzing patient's medical lab reports which contains test details about complete blood count,liver tests,kidney tests and cholesterol test. Your task is to provide the answer for the user's query based on the provided context
+        Context: {context}
+        Question: {input}""")
+        chain = create_stuff_documents_chain(llm=llm,prompt=prompt)
+        retriever = vectordb.as_retriever()
+        retreival_chain = create_retrieval_chain(
+            retriever,
+            chain
+        )
+        response = retreival_chain.invoke({
+            "input": input,
+        })
+        text = dict(response)
+        print(text)
         
+        answer_pattern = re.compile(r'Answer:\s*(.*)', re.DOTALL)
+
+        question_pattern = re.compile(r'Question.*?\.\s*(.*)', re.DOTALL)
+
+        extracted_wordings = []
+    
+        for key, value in text.items():
+            if isinstance(value, str):  
+            
+                match = answer_pattern.search(value)
+                if match:
+                    extracted_wordings.append(match.group(1))
+                else:
+                    match = question_pattern.search(value)
+                    if match:
+                        extracted_wordings.append(match.group(1))
+        if extracted_wordings:
+            return extracted_wordings[0]
+        else:
+            print("No answers or questions found.")
+        return 'Query processing is done'
 

@@ -1,5 +1,6 @@
 import os
 import re
+import warnings
 from langchain_huggingface  import HuggingFaceEmbeddings
 from langchain_community.vectorstores import Chroma
 from langchain_community.llms.huggingface_hub import HuggingFaceHub
@@ -8,15 +9,15 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_community.document_loaders import PyMuPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-
-
+warnings.filterwarnings("ignore")
 
 
 class Model:
     
     def __init__(self):
         os.environ['HUGGINGFACEHUB_API_TOKEN'] = "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"
-        self.summarization()
+        #self.summarization()
+        self.embedding  = None
         #self.preprocesspdf()
         
     def pdfprocessing(self,pdf_filename):
@@ -28,20 +29,22 @@ class Model:
         texts = text_splitter.split_documents(documents)
         print("document splitted")
         persist_directory = 'db3'
-        embedding = HuggingFaceEmbeddings()
+        #global embedding
+        self.embedding = HuggingFaceEmbeddings()
         print("Embedding done")
-        vectordb = Chroma.from_documents(documents=texts, embedding=embedding,persist_directory=persist_directory)
+        vectordb = Chroma.from_documents(documents=texts, embedding=self.embedding,persist_directory=persist_directory)
         print("storage done")
         vectordb.persist()
         print("DB storage done")
         vectordb = None
         
     def summarization(self):
-        embeddings = HuggingFaceEmbeddings()
+        #global embedding
+        #embeddings = HuggingFaceEmbeddings()
         print('embedding done')
         persist_directory = 'db3'
         vectordb = Chroma(persist_directory=persist_directory, 
-                    embedding_function=embeddings)
+                    embedding_function=self.embedding)
         llm = HuggingFaceHub(repo_id='mistralai/Mistral-7B-Instruct-v0.2',model_kwargs={'temperature':0.1,'max_new_tokens':6000})
         global input
         input = "Provide a detailed analysis and summarization of complete Blood count, Liver tests, Kidney tests, Cholesterol tests from the report."

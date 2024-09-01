@@ -178,6 +178,22 @@ body.dark {
   transition: .3s;
 }
 
+.sidebar .nav_link.disabled {
+  pointer-events: none; /* Disable clicks */
+  color: lightgrey; /* Change color to indicate disabled */
+  cursor: not-allowed; /* Show 'not-allowed' cursor */
+  opacity: 0.5;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 4px 15px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: var(--grey-color);
+  white-space: nowrap;
+  transition: .3s; /* Lower opacity to indicate the link is disabled */
+}
+
 .sidebar.close .navlink {
   display: none;
 }

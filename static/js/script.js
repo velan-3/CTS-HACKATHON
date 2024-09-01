@@ -112,7 +112,12 @@ document.getElementById('summarizeBtn').addEventListener('click', function () {
 
           // Clear previous content in the PDF viewer
           pdfViewer.innerHTML = '';
-
+          const links = document.querySelectorAll('.nav_link.disabled');
+  
+          // Remove the 'disabled' class to activate them
+          links.forEach(link => {
+              link.classList.remove('disabled');
+          });
           // Create and append the typewriter effect container
           const summaryTile = document.createElement('div');
           summaryTile.classList.add('full-width-tile');  // Ensure full-width-tile class is added
@@ -222,7 +227,7 @@ function typeWriter(text, element, callback) {
     if (index < text.length) {
       element.innerHTML += text.charAt(index);
       index++;
-      setTimeout(type, 10); // Adjust speed here
+      setTimeout(type, 5); // Adjust speed here
     } else if (callback) {
       callback(); // Call the callback function after typing is complete
     }

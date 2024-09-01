@@ -90,12 +90,17 @@ def summarize_pdf():
         "blood": {
         "haemoglobin": r"Haemoglobin",
         "PCV": r"Packed Cell Volume \(PCV\)",
+        "PCV": r"PCV",
+        "RBC": r"RBC Count",
+        "MCV": r"MCV",
+        "MCH": r"MCH",
+        "MCHC": r"MCHC",
+        "RDW": r"RDW",
         "RBC": r"Red Blood Cell \(RBC\) count",
         "MCV": r"Mean Corpuscular Volume \(MCV\)",
         "MCH": r"Mean Corpuscular Hemoglobin \(MCH\)",
         "MCHC": r"Mean Corpuscular Hemoglobin Concentration \(MCHC\)",
         "RDW": r"Red Blood Cell Distribution Width \(RDW\)",
-        "TLC": r"Total Leukocyte Count \(TLC\)",
         "platelet": r"Platelet count",
         "neutrophils": r"Neutrophils",
         "lymphocytes": r"Lymphocytes",
@@ -108,6 +113,9 @@ def summarize_pdf():
             "bilirubin_total": r"Total Bilirubin",
             "bilirubin_direct": r"Bilirubin Conjugated \(Direct\)",
             "bilirubin_indirect": r"Bilirubin Indirect",
+            "ALT": r"ALT",
+            "AST": r"AST",
+            "Alk": r"Alkaline Phosphatase",
             "ALT": r"Alanine Aminotransferase \(ALT\)",
             "AST": r"Aspartate Aminotransferase \(AST\)",
             "Alk": r"Alkaline Phosphatase",
@@ -179,6 +187,8 @@ def summarize_pdf():
 def charts_config():
     global blood_test_results, liver_function_test_results
     global cholesterol_test_results, kidney_test_results
+    if not (blood_test_results and liver_function_test_results and cholesterol_test_results and kidney_test_results):
+        return jsonify({'error': 'Test results are not available'}), 200
     print(blood_test_results)
     print(liver_function_test_results)
     print(kidney_test_results)
@@ -189,10 +199,9 @@ def charts_config():
             'id': 'cbcChart',
             'type': 'bar',
             'label': 'CBC Results',
-            'data': [11.2, 12.5, blood_test_results["RBC"], blood_test_results["MCV"], blood_test_results["MCH"], blood_test_results["MCHC"], blood_test_results["TLC"]
-],
+            'data': [blood_test_results["haemoglobin"], blood_test_results["MCV"], blood_test_results["MCH"], blood_test_results["MCHC"]],
             'bgColor': 'rgba(54, 162, 235, 0.7)',
-            'labels': ["Haemoglobin", "PCV", "RBC", "MCV", "MCH", "MCHC", "TLC"],
+            'labels': ["Haemoglobin", "MCV", "MCH", "MCHC"],
             'yMin': 0,
             'yMax': 100,
         },

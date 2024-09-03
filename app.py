@@ -3,10 +3,12 @@ from werkzeug.utils import secure_filename
 from model import Model
 import os, re, shutil
 from flask_cors import CORS
+import sqlite3
 
 app = Flask(__name__)
 CORS(app)
 app.config["UPLOAD_FOLDER"] = "./upload"
+global summaries_cache
 summaries_cache = {}
 global uploaded_filename
 uploaded_filename = None
@@ -27,6 +29,8 @@ def index():
 def upload_file():
     global uploaded_filename
     delete_all_files_in_folder("./upload")
+    conn = sqlite3.connect('db/chroma.sqlite3')
+    conn.close()
     delete_all_files_in_folder("./db")
     if "pdf" not in request.files:
         return jsonify({"error": "No file part"}), 400
@@ -65,6 +69,7 @@ def summarize_pdf():
     global uploaded_filename
     global blood_test_results, liver_function_test_results
     global cholesterol_test_results, kidney_test_results
+    global summaries_cache
     if uploaded_filename in summaries_cache:
         print("Returning cached summary")
         summary = summaries_cache[uploaded_filename]
@@ -313,10 +318,12 @@ def charts_config():
 
 @app.route('/process-query', methods=['POST'])
 def process_query():
+    global summaries_cache,uploaded_filename
+    context = summaries_cache[uploaded_filename]
     data = request.json
     search_query = data.get('query', '')
     model = Model()
-    response = model.Extraction(search_query)  
+    response = model.Extraction(search_query,context)  
     # Placeholder response
     return jsonify({'result': response})
 

@@ -9,6 +9,8 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_community.document_loaders import PyMuPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_core.documents import Document
+
 warnings.filterwarnings("ignore")
 
 
@@ -29,23 +31,22 @@ class Model:
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=5000, chunk_overlap=300)
         texts = text_splitter.split_documents(documents)
         print("document splitted")
-        persist_directory = 'db'
+        #persist_directory = 'db'
         #global embedding
         self.embedding = HuggingFaceEmbeddings()
         print("Embedding done")
-        vectordb = Chroma.from_documents(documents=texts, embedding=self.embedding,persist_directory=persist_directory)
+        self.vectordbl = Chroma.from_documents(documents=texts, embedding=self.embedding)
         print("storage done")
-        vectordb.persist()
+        #self.vectordbl.persist()
         print("DB storage done")
-        vectordb = None
         
     def summarization(self):
         #global embedding
         #embeddings = HuggingFaceEmbeddings()
         print('Loading db')
-        persist_directory = 'db'
-        self.vectordbl = Chroma(persist_directory=persist_directory, 
-                    embedding_function=self.embedding)
+        # persist_directory = 'db'
+        # self.vectordbl = Chroma(persist_directory=persist_directory, 
+        #             embedding_function=self.embedding)
         llm = HuggingFaceHub(repo_id='mistralai/Mistral-7B-Instruct-v0.2',model_kwargs={'temperature':0.1,'max_new_tokens':6000})
         global input
         input = "Provide a detailed analysis and summarization of complete Blood count, Liver tests, Kidney tests, Cholesterol tests from the report."
@@ -100,7 +101,9 @@ Question: {input}
         })
         text = dict(response)
         print(text)
-        
+        if self.vectordbl:
+            self.vectordbl.delete_collection()
+            self.vectordbl = None
         answer_pattern = re.compile(r'Answer:\s*(.*)', re.DOTALL)
 
         question_pattern = re.compile(r'Question.*?\.\s*(.*)', re.DOTALL)
@@ -122,50 +125,40 @@ Question: {input}
         else:
             print("No answers or questions found.")
         
-    def Extraction(self,query):
+    def Extraction(self,query,context):
         print('Loading db')
-        persist_directory = 'db'
+        #persist_directory = 'db'
         print("Query")
-        llm = HuggingFaceHub(repo_id='mistralai/Mistral-7B-Instruct-v0.2',model_kwargs={'temperature':0.1,'max_new_tokens':6000})
+        llm = HuggingFaceHub(repo_id='mistralai/Mistral-7B-Instruct-v0.2',model_kwargs={'temperature':0.1,'max_new_tokens':1000})
         input = query
-        self.embedding = HuggingFaceEmbeddings()
-        vectordb = Chroma(persist_directory=persist_directory, 
-                    embedding_function=self.embedding)
+        document = Document(page_content=context, metadata={})
+        #self.embedding = HuggingFaceEmbeddings()
+        #vectordb = Chroma(persist_directory=persist_directory, 
+        #           embedding_function=self.embedding)
         prompt = ChatPromptTemplate.from_template("""
         You are a medical professional analyzing patient's medical lab reports which contains test details about complete blood count,liver tests,kidney tests and cholesterol test. Your task is to provide the answer for the user's query based on the provided context
         Context: {context}
         Question: {input}""")
         chain = create_stuff_documents_chain(llm=llm,prompt=prompt)
-        retriever = vectordb.as_retriever()
-        retreival_chain = create_retrieval_chain(
-            retriever,
-            chain
-        )
-        response = retreival_chain.invoke({
+        #retriever = vectordb.as_retriever()
+        # retreival_chain = create_retrieval_chain(
+        #     retriever,
+        #     chain
+        # )
+        response = chain.invoke({
             "input": input,
+            "context": [document]
         })
-        text = dict(response)
+        text = response
         print(text)
-        
         answer_pattern = re.compile(r'Answer:\s*(.*)', re.DOTALL)
-
-        question_pattern = re.compile(r'Question.*?\.\s*(.*)', re.DOTALL)
-
         extracted_wordings = []
-    
-        for key, value in text.items():
-            if isinstance(value, str):  
-            
-                match = answer_pattern.search(value)
-                if match:
-                    extracted_wordings.append(match.group(1))
-                else:
-                    match = question_pattern.search(value)
-                    if match:
-                        extracted_wordings.append(match.group(1))
+        match = answer_pattern.search(text)
+        if match:
+            extracted_wordings.append(match.group(1))  
+
         if extracted_wordings:
             return extracted_wordings[0]
         else:
             print("No answers or questions found.")
-        return 'Query processing is done'
-
+            return 'Query processing is done'

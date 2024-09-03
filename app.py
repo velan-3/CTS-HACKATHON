@@ -3,7 +3,10 @@ from werkzeug.utils import secure_filename
 from model import Model
 import os, re, shutil
 from flask_cors import CORS
-import sqlite3
+import pickle
+import pandas as pd
+import numpy as np
+from sklearn.preprocessing import  StandardScaler
 
 app = Flask(__name__)
 CORS(app)
@@ -18,6 +21,7 @@ blood_test_results = {}
 kidney_test_results = {}
 liver_function_test_results = {}
 cholesterol_test_results = {}
+global gender,age
 
 
 @app.route("/")
@@ -29,9 +33,6 @@ def index():
 def upload_file():
     global uploaded_filename
     delete_all_files_in_folder("./upload")
-    conn = sqlite3.connect('db/chroma.sqlite3')
-    conn.close()
-    delete_all_files_in_folder("./db")
     if "pdf" not in request.files:
         return jsonify({"error": "No file part"}), 400
 
@@ -70,6 +71,7 @@ def summarize_pdf():
     global blood_test_results, liver_function_test_results
     global cholesterol_test_results, kidney_test_results
     global summaries_cache
+    global gender,age
     if uploaded_filename in summaries_cache:
         print("Returning cached summary")
         summary = summaries_cache[uploaded_filename]
@@ -101,77 +103,99 @@ def summarize_pdf():
             re.DOTALL,
         ),
         "cholesterol": re.compile(r"Cholesterol Test Results:.*", re.DOTALL),
+        "gender": re.compile(r"Gender[:\s]*(Male|Female|Other|M|F)", re.IGNORECASE),
+        "age": re.compile(r"Age[:\s]*(\d+)", re.IGNORECASE),
     }
 
     lab_tests = {
         "blood": {
-        "haemoglobin": r"Haemoglobin",
-        "PCV": r"Packed Cell Volume \(PCV\)",
-        "PCV": r"PCV",
-        "RBC": r"RBC Count",
-        "MCV": r"MCV",
-        "MCH": r"MCH",
-        "MCHC": r"MCHC",
-        "RDW": r"RDW",
-        "RBC": r"Red Blood Cell \(RBC\) count",
-        "MCV": r"Mean Corpuscular Volume \(MCV\)",
-        "MCH": r"Mean Corpuscular Hemoglobin \(MCH\)",
-        "MCHC": r"Mean Corpuscular Hemoglobin Concentration \(MCHC\)",
-        "RDW": r"Red Blood Cell Distribution Width \(RDW\)",
-        "platelet": r"Platelet count",
-        "neutrophils": r"Neutrophils",
-        "lymphocytes": r"Lymphocytes",
-        "eosinophils": r"Eosinophils",
-        "monocytes": r"Monocytes",
-        "basophils": r"Basophils",
-        "nlr": r"Neutrophil lymphocyte ratio \(NLR\)"
-        },
-        "liver": {
-            "bilirubin_total": r"Total Bilirubin",
-            "bilirubin_direct": r"Bilirubin Conjugated \(Direct\)",
-            "bilirubin_indirect": r"Bilirubin Indirect",
-            "ALT": r"ALT",
-            "AST": r"AST",
-            "Alk": r"Alkaline Phosphatase",
-            "ALT": r"Alanine Aminotransferase \(ALT\)",
-            "AST": r"Aspartate Aminotransferase \(AST\)",
-            "Alk": r"Alkaline Phosphatase",
-            "Protein": r"Total Protein",
-            "Albumin": r"Albumin",
-            "Globulin": r"Globulin",
+        "haemoglobin": [r"Hemoglobin", r"Haemoglobin"],
+        "PCV": [r"Packed Cell Volume \(PCV\)", r"PCV"],
+        "RBC": [r"RBC Count"],
+        "MCV": [r"MCV"],
+        "MCH": [r"MCH"],
+        "MCHC": [r"MCHC"],
+        "RDW": [r"RDW"],
+        "platelet": [r"Platelet count"],
+        "neutrophils": [r"Neutrophils"],
+        "lymphocytes": [r"Lymphocytes"],
+        "eosinophils": [r"Eosinophils"],
+        "monocytes": [r"Monocytes"],
+        "basophils": [r"Basophils"],
+        "nlr": [r"Neutrophil lymphocyte ratio \(NLR\)"]
+    },
+    "liver": {
+        "bilirubin_total": [r"Total Bilirubin"],
+        "bilirubin_direct": [r"Bilirubin Conjugated \(Direct\)"],
+        "bilirubin_indirect": [r"Bilirubin Indirect"],
+        "ALT": [r"ALT", r"Alanine Aminotransferase \(ALT\)"],
+        "AST": [r"AST", r"Aspartate Aminotransferase \(AST\)"],
+        "Alk": [r"Alkaline Phosphatase"],
+        "Protein": [r"Total Protein"],
+        "Albumin": [r"Albumin"],
+        "Globulin": [r"Globulin"],
+        "ag": [r"A/G Ratio"]
         },
         "kidney": {
-            "creatinine": r"Creatinine",
-            "urea": r"Urea",
-            "blood_urea": r"Blood Urea Nitrogen",
-            "calcium": r"Calcium",
-            "phosphorus": r"Phosphorus, Inorganic",
-            "sodium": r"Sodium",
-            "potassium": r"Potassium",
-            "chloride": r"Chloride",
-        },
-        "cholesterol": {
-            "total_cholesterol": r"Total Cholesterol",
-            "hdl": r"HDL Cholesterol",
-            "ldl": r"LDL Cholesterol",
-            "triglycerides": r"Triglycerides",
-        },
+        "creatinine": [r"Creatinine"],
+        "urea": [r"Urea"],
+        "blood_urea": [r"Blood Urea Nitrogen"],
+        "calcium": [r"Calcium"],
+        "phosphorus": [r"Phosphorus, Inorganic"],
+        "sodium": [r"Sodium"],
+        "potassium": [r"Potassium"],
+        "chloride": [r"Chloride"],
+    },
+    "cholesterol": {
+        "total_cholesterol": [r"Total Cholesterol"],
+        "hdl": [r"HDL Cholesterol"],
+        "ldl": [r"LDL Cholesterol"],
+        "triglycerides": [r"Triglycerides"],
+    },
+        
     }
 
     def extract_lab_results(section_text, lab_tests):
         results = {}
         number_pattern = re.compile(r"[\d\.]+")
 
-        for key, test_name in lab_tests.items():
-            pattern = re.compile(
-                rf"{test_name}[:\s]*({number_pattern.pattern})", re.IGNORECASE
+        for key, test_patterns in lab_tests.items():
+            found = False
+            for pattern in test_patterns:
+                compiled_pattern = re.compile(
+                    rf"{pattern}[:\s]*({number_pattern.pattern})", re.IGNORECASE
             )
-            match = pattern.search(section_text)
-            if match:
-                value = match.group(1)
-                results[key] = value.strip()
+                match = compiled_pattern.search(section_text)
+                if match:
+                    value = match.group(1)
+                    try:
+                    # Convert to float, if possible
+                        results[key] = float(value.strip())
+                    except ValueError:
+                    # If conversion fails, store 0
+                        results[key] = 0
+                    found = True
+                    break  # Stop checking other patterns for this key
+        
+            if not found:
+            # If no pattern matched for this key
+                results[key] = 0
+        
         return results
+    def extract_gender_age(text):
+        gender = None
+        age = None
 
+        gender_match = patterns["gender"].search(text)
+        if gender_match:
+            gender = gender_match.group(1).strip()
+
+        age_match = patterns["age"].search(text)
+        if age_match:
+            age = age_match.group(1).strip()
+
+        return gender, age
+    gender,age = extract_gender_age(text)
     for category, pattern in patterns.items():
         match = pattern.search(text)
         if match:
@@ -196,6 +220,8 @@ def summarize_pdf():
     print(liver_function_test_results)
     print(kidney_test_results)
     print(cholesterol_test_results)
+    print(gender)
+    print(age)
 
     return jsonify({"summary": summary}), 200
 
@@ -326,6 +352,144 @@ def process_query():
     response = model.Extraction(search_query,context)  
     # Placeholder response
     return jsonify({'result': response})
+
+@app.route('/prediction')
+def prediction():
+    global blood_test_results, liver_function_test_results
+    global cholesterol_test_results, kidney_test_results
+    global gender,age
+    model_paths = {
+    "anemia": "mlmodel/Liver Disease/mlmodel/Liver Disease/saved_models/anemia_stacking_model.pkl",
+    "cirrhosis": "mlmodel/Liver Disease/mlmodel/Liver Disease/saved_models/cirrhosis_pipeline_model.pkl",
+    "hepatitis": "mlmodel/Liver Disease/mlmodel/Liver Disease/saved_models/hepatitis_stacking_model.pkl",
+    "liver": "mlmodel/Liver Disease/mlmodel/Liver Disease/saved_models/liver_stacking_model.pkl",
+    "kidney": "mlmodel/kidney Disease/saved_models/kidney_disease_model.pkl",
+}
+    label_encoder_kidney = "mlmodel/kidney Disease/saved_models/label_encoders.pkl"
+    with open(model_paths["anemia"], 'rb') as file:
+        anemia_model = pickle.load(file)
+    with open(model_paths["cirrhosis"], 'rb') as file:
+        cirhossis_model = pickle.load(file)
+    with open(model_paths["hepatitis"], 'rb') as file:
+        hepatitis_model = pickle.load(file)
+    with open(model_paths["liver"], 'rb') as file:
+        liver_model = pickle.load(file)
+    with open(model_paths["kidney"], 'rb') as file:
+        kidney_model = pickle.load(file)
+    with open(label_encoder_kidney, 'rb') as file:
+        kidney_label_encoder = pickle.load(file)
+        
+    if gender=="Male" or gender=="M":
+        gender_value = 1
+    else:
+        gender_value = 0    
+        
+    ##Predicting Anemia    
+    def predict_anemia(input_data):
+        input_data = np.array(input_data).reshape(1, -1)
+        prediction = anemia_model.predict(input_data)
+        return 'Anemia' if prediction[0] == 1 else 'No Anemia'
+    anemia_data = [gender_value,blood_test_results['haemoglobin'],blood_test_results['MCH'],blood_test_results['MCHC'],blood_test_results['MCV']]
+    anemia_disease = predict_anemia(anemia_data)
+
+    ##Predicting Kidney disease using anemia disease
+    categorical_cols = ['anemia']  # List of categorical columns
+    numerical_cols = ['age', 'albumin', 'blood urea', 'Creatinine', 'sodium', 'potassium', 'hemoglobin', 'wbc count', 'rbc count']
+    def predict_kidney_disease(new_data):
+    # Convert the input data to a DataFrame if it's not already one
+        if isinstance(new_data, dict):
+            new_data = pd.DataFrame([new_data])
+    # Handle missing values
+        new_data[numerical_cols] = new_data[numerical_cols].fillna(new_data[numerical_cols].median())
+    # Fill and encode categorical variables
+        for col in categorical_cols:
+            if col in new_data:
+                new_data[col] = new_data[col].fillna(new_data[col].mode().iloc[0])
+                if col in kidney_label_encoder:
+                    new_data[col] = new_data[col].apply(lambda x: kidney_label_encoder[col].transform([x])[0]
+                                                    if x in kidney_label_encoder[col].classes_ else -1)
+    # Ensure the order of columns matches the training data
+    # Here you should match the columns with the training feature columns
+        required_columns = numerical_cols + categorical_cols
+        new_data = new_data[required_columns]
+    # Make a prediction using the trained model
+        prediction = kidney_model.predict(new_data)
+    # If 'classification' is a categorical feature and encoded, you may need to decode
+        if 'classification' in kidney_label_encoder:
+            predicted_class = kidney_label_encoder['classification'].inverse_transform(prediction)
+            return predicted_class[0]
+        else:
+            return prediction[0]
+    anemia_value = 'no' if anemia_disease == "No Anemia" else 'yes'
+    kidney_data = {
+    'age': age,
+    'albumin': liver_function_test_results['Albumin'],
+    'blood urea': kidney_test_results['blood_urea'],
+    'Creatinine': kidney_test_results['creatinine'],
+    'sodium': kidney_test_results['sodium'],
+    'potassium': kidney_test_results['potassium'],
+    'hemoglobin': blood_test_results['haemoglobin'],
+    'wbc count': blood_test_results['neutrophils']+blood_test_results['lymphocytes']+blood_test_results['eosinophils']+blood_test_results['basophils']+blood_test_results['monocytes'],
+    'rbc count': blood_test_results['RBC'],
+    'anemia': anemia_value
+}
+    kidney_disease = predict_kidney_disease(kidney_data)
+    
+    ##Predicting hepatitis
+    def predict_hepatitis_disease(input_data):
+    # Convert input data to a numpy array and reshape for prediction
+        input_data = np.array(input_data).reshape(1, -1)
+    
+    # Predict using the trained stacking model
+        prediction = hepatitis_model.predict(input_data)
+    
+    # Map the prediction to the corresponding disease status
+        disease_map = {
+        0: 'No Disease',
+        1: 'Hepatitis',
+        2: 'Fibrosis',
+        3: 'Cirrhosis',
+        4: 'Blood Donor'
+    }
+    
+    # Return the predicted disease status
+        return disease_map.get(prediction[0], 'Unknown')
+    hepatitis_data = [age, gender_value, liver_function_test_results['Alk'], liver_function_test_results['ALT'], liver_function_test_results['AST']]
+    hepatitis_disease = predict_hepatitis_disease(hepatitis_data)
+    
+    ##Predicting cirrhosis
+    hepatitis_value = 1 if anemia_disease == "Hepatitis" else 0
+    new_data = pd.DataFrame({
+    'Age': [age],
+    'Gender': [gender_value],  # 0 for male, 1 for female
+    'Hepatitis_C_infection': [hepatitis_value],  # 0 for negative, 1 for positive
+    'Total Bilirubin(mg/dl)': [liver_function_test_results['bilirubin_total']],
+    'Direct(mg/dl)': [liver_function_test_results['bilirubin_direct']],
+    'Indirect(mg/dl)': [liver_function_test_results['bilirubin_indirect']],
+    'Albumin(g/dl)': [liver_function_test_results['Albumin']],
+    'Globulin(g/dl)': [liver_function_test_results['Globulin']],
+    'A/G Ratio': [liver_function_test_results['ag']],
+    'AL.Phosphatase(U/L)': [liver_function_test_results['Alk']],
+    'SGOT/AST(U/L)': [liver_function_test_results['AST']],
+    'SGPT/ALT(U/L)': [liver_function_test_results['ALT']]
+})
+    cirhossis_disease = cirhossis_model.predict(new_data)
+    
+    ##Predicting LiverDisease
+    def predict_liver_disease(input_data):
+    # Convert input data to a numpy array
+        scaler = StandardScaler()
+        input_data = np.array(input_data).reshape(1, -1)
+    # Standardize the input data
+        input_data = scaler.transform(input_data)
+    # Predict using the stacking model
+        prediction = liver_model.predict(input_data)
+    # Return the prediction
+        return 'Liver Disease' if prediction[0] == 1 else 'No Liver Disease'
+    
+    liver_data = [age,gender_value,liver_function_test_results['bilirubin_total'],liver_function_test_results['bilirubin_direct']]
+    liver_disease = predict_liver_disease(liver_data)
+
 
 if __name__ == "__main__":
     app.run(debug=False)

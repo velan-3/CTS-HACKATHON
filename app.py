@@ -6,7 +6,7 @@ from flask_cors import CORS
 import pickle
 import pandas as pd
 import numpy as np
-from sklearn.preprocessing import  StandardScaler
+
 
 app = Flask(__name__)
 CORS(app)
@@ -110,12 +110,12 @@ def summarize_pdf():
     lab_tests = {
         "blood": {
         "haemoglobin": [r"Hemoglobin", r"Haemoglobin"],
-        "PCV": [r"Packed Cell Volume \(PCV\)", r"PCV"],
-        "RBC": [r"RBC Count"],
-        "MCV": [r"MCV"],
-        "MCH": [r"MCH"],
-        "MCHC": [r"MCHC"],
-        "RDW": [r"RDW"],
+        "PCV": [r"Packed Cell Volume \(PCV\)", r"PCV",r"Hematocrit Value, Hct"r"Red Blood Cell \(RBC\) count"],
+        "RBC": [r"RBC Count",r"Total RBC Count"],
+        "MCV": [r"MCV",r"Mean Corpuscular Volume, MCV",r"Mean Corpuscular Volume \(MCV\)"],
+        "MCH": [r"MCH",r"Mean Cell Haemoglobin, MCH",r"Mean Corpuscular Hemoglobin \(MCH\)"],
+        "MCHC": [r"MCHC",r"Mean Cell Haemoglobin CON, MCHC",r"Mean Corpuscular Hemoglobin Concentration \(MCHC\)"],
+        "RDW": [r"RDW",r"R.D.W. - CV",r"Red Cell Distribution Width \(RDW\)"],
         "platelet": [r"Platelet count"],
         "neutrophils": [r"Neutrophils"],
         "lymphocytes": [r"Lymphocytes"],
@@ -125,25 +125,25 @@ def summarize_pdf():
         "nlr": [r"Neutrophil lymphocyte ratio \(NLR\)"]
     },
     "liver": {
-        "bilirubin_total": [r"Total Bilirubin"],
-        "bilirubin_direct": [r"Bilirubin Conjugated \(Direct\)"],
-        "bilirubin_indirect": [r"Bilirubin Indirect"],
-        "ALT": [r"ALT", r"Alanine Aminotransferase \(ALT\)"],
-        "AST": [r"AST", r"Aspartate Aminotransferase \(AST\)"],
-        "Alk": [r"Alkaline Phosphatase"],
-        "Protein": [r"Total Protein"],
-        "Albumin": [r"Albumin"],
+        "bilirubin_total": [r"Total Bilirubin",r"Serum Bilirubin \(Total\)"],
+        "bilirubin_direct": [r"Bilirubin Conjugated \(Direct\)",r"Serum Bilirubin \(Direct\)",r"Bilirubin Direct"],
+        "bilirubin_indirect": [r"Bilirubin Indirect",r"Serum Bilirubin \(Indirect\)"],
+        "ALT": [r"ALT", r"Alanine Aminotransferase \(ALT\)",r"SGPT \(ALT\)"],
+        "AST": [r"AST", r"Aspartate Aminotransferase \(AST\)",r"SGOT \(AST\)"],
+        "Alk": [r"Alkaline Phosphatase",r"Serum Alkaline Phosphatase"],
+        "Protein": [r"Total Protein",r"Serum Protein",r"Protein, Total"],
+        "Albumin": [r"Albumin",r"Serum Albumin"],
         "Globulin": [r"Globulin"],
         "ag": [r"A/G Ratio"]
         },
         "kidney": {
-        "creatinine": [r"Creatinine"],
-        "urea": [r"Urea"],
-        "blood_urea": [r"Blood Urea Nitrogen"],
-        "calcium": [r"Calcium"],
+        "creatinine": [r"Creatinine",r"Serum Creatinine"],
+        "urea": [r"Urea",r"Serum Urea"],
+        "blood_urea": [r"Blood Urea Nitrogen",r"BUN"],
+        "calcium": [r"Calcium",r"Serum Calcium"],
         "phosphorus": [r"Phosphorus, Inorganic"],
-        "sodium": [r"Sodium"],
-        "potassium": [r"Potassium"],
+        "sodium": [r"Sodium",r"Serum Sodium"],
+        "potassium": [r"Potassium",r"Serum Potassium"],
         "chloride": [r"Chloride"],
     },
     "cholesterol": {
@@ -358,6 +358,8 @@ def prediction():
     global blood_test_results, liver_function_test_results
     global cholesterol_test_results, kidney_test_results
     global gender,age
+    if not (blood_test_results and liver_function_test_results and cholesterol_test_results and kidney_test_results):
+        return jsonify({'error': 'Test results are not available'}), 200
     model_paths = {
     "anemia": "mlmodel/Liver Disease/mlmodel/Liver Disease/saved_models/anemia_stacking_model.pkl",
     "cirrhosis": "mlmodel/Liver Disease/mlmodel/Liver Disease/saved_models/cirrhosis_pipeline_model.pkl",
@@ -378,6 +380,8 @@ def prediction():
         kidney_model = pickle.load(file)
     with open(label_encoder_kidney, 'rb') as file:
         kidney_label_encoder = pickle.load(file)
+    with open("D:/Projects/LLM Models/mlmodel/Liver Disease/mlmodel/Liver Disease/saved_models/scaler.pkl", 'rb') as model_file:
+        scaler = pickle.load(model_file)
         
     if gender=="Male" or gender=="M":
         gender_value = 1
@@ -391,7 +395,7 @@ def prediction():
         return 'Anemia' if prediction[0] == 1 else 'No Anemia'
     anemia_data = [gender_value,blood_test_results['haemoglobin'],blood_test_results['MCH'],blood_test_results['MCHC'],blood_test_results['MCV']]
     anemia_disease = predict_anemia(anemia_data)
-
+    print('anemia done')
     ##Predicting Kidney disease using anemia disease
     categorical_cols = ['anemia']  # List of categorical columns
     numerical_cols = ['age', 'albumin', 'blood urea', 'Creatinine', 'sodium', 'potassium', 'hemoglobin', 'wbc count', 'rbc count']
@@ -422,7 +426,7 @@ def prediction():
             return prediction[0]
     anemia_value = 'no' if anemia_disease == "No Anemia" else 'yes'
     kidney_data = {
-    'age': age,
+    'age': int(age),
     'albumin': liver_function_test_results['Albumin'],
     'blood urea': kidney_test_results['blood_urea'],
     'Creatinine': kidney_test_results['creatinine'],
@@ -434,7 +438,7 @@ def prediction():
     'anemia': anemia_value
 }
     kidney_disease = predict_kidney_disease(kidney_data)
-    
+    print('kidney done')
     ##Predicting hepatitis
     def predict_hepatitis_disease(input_data):
     # Convert input data to a numpy array and reshape for prediction
@@ -454,13 +458,13 @@ def prediction():
     
     # Return the predicted disease status
         return disease_map.get(prediction[0], 'Unknown')
-    hepatitis_data = [age, gender_value, liver_function_test_results['Alk'], liver_function_test_results['ALT'], liver_function_test_results['AST']]
+    hepatitis_data = [int(age), gender_value, liver_function_test_results['Alk'], liver_function_test_results['ALT'], liver_function_test_results['AST'],kidney_test_results['creatinine']]
     hepatitis_disease = predict_hepatitis_disease(hepatitis_data)
-    
+    print('Hepatitis done')
     ##Predicting cirrhosis
     hepatitis_value = 1 if anemia_disease == "Hepatitis" else 0
     new_data = pd.DataFrame({
-    'Age': [age],
+    'Age': [int(age)],
     'Gender': [gender_value],  # 0 for male, 1 for female
     'Hepatitis_C_infection': [hepatitis_value],  # 0 for negative, 1 for positive
     'Total Bilirubin(mg/dl)': [liver_function_test_results['bilirubin_total']],
@@ -473,12 +477,15 @@ def prediction():
     'SGOT/AST(U/L)': [liver_function_test_results['AST']],
     'SGPT/ALT(U/L)': [liver_function_test_results['ALT']]
 })
-    cirhossis_disease = cirhossis_model.predict(new_data)
-    
+    def predict_cirrhosis(input_data):
+        input_data = np.array(input_data).reshape(1, -1)
+        prediction = cirhossis_model.predict(input_data)
+        return 'YES' if prediction[0] == 1 else 'NO'
+    cirhossis_disease = predict_cirrhosis(new_data)
+    print('cirrhosis done')
     ##Predicting LiverDisease
     def predict_liver_disease(input_data):
     # Convert input data to a numpy array
-        scaler = StandardScaler()
         input_data = np.array(input_data).reshape(1, -1)
     # Standardize the input data
         input_data = scaler.transform(input_data)
@@ -487,9 +494,50 @@ def prediction():
     # Return the prediction
         return 'Liver Disease' if prediction[0] == 1 else 'No Liver Disease'
     
-    liver_data = [age,gender_value,liver_function_test_results['bilirubin_total'],liver_function_test_results['bilirubin_direct']]
+    liver_data = [int(age), gender_value, liver_function_test_results['bilirubin_total'], liver_function_test_results['bilirubin_direct'], liver_function_test_results['Alk'], liver_function_test_results['ALT'], liver_function_test_results['AST'], liver_function_test_results['Protein'], liver_function_test_results['Albumin'], liver_function_test_results['ag']]  # Example values; should be set dynamically
     liver_disease = predict_liver_disease(liver_data)
-
-
+    print('liver done')
+    print(liver_disease)
+    print(anemia_disease)
+    print(hepatitis_disease)
+    print(cirhossis_disease)
+    print(kidney_disease)
+    prediction_details = []
+    if anemia_disease=="Anemia":
+        prediction_details.append({
+            "organ": "Blood",
+            "disease": "Anemia",
+            "image": "static/images/brain-male.jpg",
+            "description": "Anemia is a condition in which you lack enough healthy red blood cells to carry adequate oxygen to your body's tissues."
+        })
+    if hepatitis_disease == "Hepatitis":
+        prediction_details.append({
+            "organ": "Liver",
+            "disease": "Hepatitis",
+            "image": "static/images/lung-male.jpg",
+            "description": "Hepatitis is an inflammation of the liver, commonly caused by a viral infection."
+        })
+    if cirhossis_disease=="YES":
+        prediction_details.append({
+            "organ": "Liver",
+            "disease": "Cirrhosis",
+            "image": "static/images/brain-male.jpg",
+            "description": "Cirrhosis is a late stage of scarring (fibrosis) of the liver caused by many forms of liver diseases and conditions."
+        })
+    if kidney_disease=="ckd":
+        prediction_details.append({
+            "organ": "Kidney",
+            "disease": "Chronic Kidney Disease",
+            "image": "static/images/heart-male.jpg",
+            "description": "Chronic kidney disease (CKD) is a long-term condition where the kidneys don't work as well as they should."
+        })
+    if liver_disease=="Liver Disease":
+        prediction_details.append({
+            "organ": "Liver",
+            "disease": "Liver Disease",
+            "image": "static/images/lung-female.jpg",
+            "description": "Liver disease refers to any condition that impairs the liver's ability to function properly."
+        })
+    return jsonify(prediction_details), 200
 if __name__ == "__main__":
     app.run(debug=False)

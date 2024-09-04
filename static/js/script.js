@@ -422,60 +422,113 @@ document.getElementById("searchBtn").addEventListener("click", function () {
   
 });
 
-// Prediction section
-function changePrediction() {
-  const predictions = [
-      { 
-          organ: 'Lung', 
-          disease: 'Pneumonia', 
-          image: 'static/images/lung-male.jpg', 
-          description: 'Pneumonia is an infection that inflames the air sacs in one or both lungs, which may fill with fluid.' 
-      },
-      { 
-          organ: 'Heart', 
-          disease: 'Myocardial Infarction', 
-          image: 'static/images/heart-male.jpg', 
-          description: 'Myocardial infarction, commonly known as a heart attack, occurs when blood flow decreases or stops to a part of the heart, causing damage to the heart muscle.' 
-      },
-      { 
-          organ: 'Brain', 
-          disease: 'Stroke', 
-          image: 'static/images/brain-male.jpg', 
-          description: 'A stroke occurs when the blood supply to part of the brain is interrupted or reduced, preventing brain tissue from getting oxygen and nutrients.' 
-      },
-      { 
-          organ: 'Lung', 
-          disease: 'Pneumonia', 
-          image: 'static/images/lung-female.jpg', 
-          description: 'Pneumonia is an infection that inflames the air sacs in one or both lungs, which may fill with fluid.' 
-      },
-      { 
-          organ: 'Heart', 
-          disease: 'Myocardial Infarction', 
-          image: 'static/images/heart-female.jpg', 
-          description: 'Myocardial infarction, commonly known as a heart attack, occurs when blood flow decreases or stops to a part of the heart, causing damage to the heart muscle.' 
-      },
-      { 
-          organ: 'Brain', 
-          disease: 'Stroke', 
-          image: 'static/images/brain-female.jpg', 
-          description: 'A stroke occurs when the blood supply to part of the brain is interrupted or reduced, preventing brain tissue from getting oxygen and nutrients.' 
-      }
-  ];
 
-  // Randomly select a prediction
-  const randomIndex = Math.floor(Math.random() * predictions.length);
-  const prediction = predictions[randomIndex];
-
-  // Update the image and prediction details
-  document.getElementById('prediction-image').src = prediction.image;
-  document.getElementById('predicted-organ').innerText = `Predicted Organ: ${prediction.organ}`;
-  document.getElementById('predicted-disease').innerText = `Predicted Disease: ${prediction.disease}`;
-  document.getElementById('disease-description').innerText = prediction.description;
+let cachedPredictions = []; // Array to store fetched predictions
+let currentIndex = 0;
+// Function to fetch predictions from the Flask backend
+async function fetchPredictions() {
+    try {
+        const response = await fetch('/prediction'); // Fetch prediction data from the Flask endpoint
+        const predictions = await response.json(); // Parse JSON response
+        cachedPredictions = predictions; // Cache the fetched data
+        updatePredictionUI(cachedPredictions); // Update UI with the first prediction
+    } catch (error) {
+        console.error('Error fetching prediction data:', error);
+    }
 }
 
-// Add an event listener to the button to trigger the function
-document.getElementById('changePredictionBtn').addEventListener('click', changePrediction);
+function updatePredictionUI(predictions) {
+  if (predictions.length > 0) {
+    // Use the current index to select the prediction
+    const prediction = predictions[currentIndex];
+
+    // Update the image and prediction details
+    document.getElementById('prediction-image').src = prediction.image;
+    document.getElementById('predicted-organ').innerText = `Predicted Organ: ${prediction.organ}`;
+    document.getElementById('predicted-disease').innerText = `Predicted Disease: ${prediction.disease}`;
+    document.getElementById('disease-description').innerText = prediction.description;
+
+    // Update the index for the next call
+    currentIndex = (currentIndex + 1) % predictions.length;
+} else {
+    // Handle the case where no predictions are available
+    document.getElementById('prediction-image').src = ''; // Clear image
+    document.getElementById('predicted-organ').innerText = 'No predictions available';
+    document.getElementById('predicted-disease').innerText = '';
+    document.getElementById('disease-description').innerText = '';
+}
+}
+
+// Add event listener to the "Prediction" link
+document.getElementById('PredictionLink').addEventListener('click', function(event) {
+  // Prevent default link action if needed
+  event.preventDefault();
+
+  // Fetch and update predictions when the link is clicked
+  fetchPredictions();
+});
+
+// Add an event listener to the "Change Prediction" button to show a different prediction
+document.getElementById('changePredictionBtn').addEventListener('click', function() {
+  if (cachedPredictions.length > 0) {
+      updatePredictionUI(cachedPredictions); // Update UI with a new prediction from the cached data
+  }
+});
+
+// // Prediction section
+// function changePrediction() {
+//   const predictions = [
+//       { 
+//           organ: 'Lung', 
+//           disease: 'Pneumonia', 
+//           image: 'static/images/lung-male.jpg', 
+//           description: 'Pneumonia is an infection that inflames the air sacs in one or both lungs, which may fill with fluid.' 
+//       },
+//       { 
+//           organ: 'Heart', 
+//           disease: 'Myocardial Infarction', 
+//           image: 'static/images/heart-male.jpg', 
+//           description: 'Myocardial infarction, commonly known as a heart attack, occurs when blood flow decreases or stops to a part of the heart, causing damage to the heart muscle.' 
+//       },
+//       { 
+//           organ: 'Brain', 
+//           disease: 'Stroke', 
+//           image: 'static/images/brain-male.jpg', 
+//           description: 'A stroke occurs when the blood supply to part of the brain is interrupted or reduced, preventing brain tissue from getting oxygen and nutrients.' 
+//       },
+//       { 
+//           organ: 'Lung', 
+//           disease: 'Pneumonia', 
+//           image: 'static/images/lung-female.jpg', 
+//           description: 'Pneumonia is an infection that inflames the air sacs in one or both lungs, which may fill with fluid.' 
+//       },
+//       { 
+//           organ: 'Heart', 
+//           disease: 'Myocardial Infarction', 
+//           image: 'static/images/heart-female.jpg', 
+//           description: 'Myocardial infarction, commonly known as a heart attack, occurs when blood flow decreases or stops to a part of the heart, causing damage to the heart muscle.' 
+//       },
+//       { 
+//           organ: 'Brain', 
+//           disease: 'Stroke', 
+//           image: 'static/images/brain-female.jpg', 
+//           description: 'A stroke occurs when the blood supply to part of the brain is interrupted or reduced, preventing brain tissue from getting oxygen and nutrients.' 
+//       }
+//   ];
+
+//   // Randomly select a prediction
+//   const randomIndex = Math.floor(Math.random() * predictions.length);
+//   const prediction = predictions[randomIndex];
+
+//   // Update the image and prediction details
+//   document.getElementById('prediction-image').src = prediction.image;
+//   document.getElementById('predicted-organ').innerText = `Predicted Organ: ${prediction.organ}`;
+//   document.getElementById('predicted-disease').innerText = `Predicted Disease: ${prediction.disease}`;
+//   document.getElementById('disease-description').innerText = prediction.description;
+// }
+
+// // Add an event listener to the button to trigger the function
+// document.getElementById('changePredictionBtn').addEventListener('click', changePrediction);
 
 
 

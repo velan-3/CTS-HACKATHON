@@ -47,6 +47,7 @@ class Model:
         # persist_directory = 'db'
         # self.vectordbl = Chroma(persist_directory=persist_directory, 
         #             embedding_function=self.embedding)
+        #done
         llm = HuggingFaceHub(repo_id='mistralai/Mistral-7B-Instruct-v0.2',model_kwargs={'temperature':0.1,'max_new_tokens':6000})
         global input
         input = "Provide a detailed analysis and summarization of complete Blood count, Liver tests, Kidney tests, Cholesterol tests from the report."

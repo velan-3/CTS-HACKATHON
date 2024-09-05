@@ -310,6 +310,17 @@ body.dark {
   display: none;
 }
 
+.illustration {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.illustration img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
 @media screen and (max-width: 768px) {
   #sidebarOpen {
     font-size: 25px;

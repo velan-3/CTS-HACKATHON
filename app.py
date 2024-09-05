@@ -538,6 +538,7 @@ def prediction():
             "image": "static/images/lung-female.jpg",
             "description": "Liver disease refers to any condition that impairs the liver's ability to function properly."
         })
+    #done
     return jsonify(prediction_details), 200
 if __name__ == "__main__":
     app.run(debug=False)

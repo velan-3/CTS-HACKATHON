@@ -105,7 +105,9 @@ document.getElementById('summarizeBtn').addEventListener('click', function () {
           console.log("Details fetched");
 
           // Assume the server sends back the summarized content in 'data.summary'
-          const structuredSummary = data.summary;
+          let sum = data.summary
+          //let formattedSummary = sum.split("\n").map(line => line).join("\n\n");
+          const structuredSummary = sum;
 
           // Combine the summary message and structured summary into one string
           const fullSummaryText = summaryMessage + structuredSummary;
@@ -169,6 +171,32 @@ document.getElementById('visualizationLink').addEventListener('click', function(
   renderCharts();
 });
 
+document.getElementById('consultationlink').addEventListener('click', function(event) {
+    event.preventDefault();
+    fetch('/consultation') 
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json(); 
+        })
+        .then(data => {
+            console.log(data); 
+            const lines = data.split('\n');
+            const dataContainer = document.getElementById('fetched-data');
+            dataContainer.innerHTML= '';
+            lines.forEach(function(line) {
+              const p = document.createElement('p');  // Create a <p> element
+              p.textContent = line.trim();            // Set the text content to the current line
+              dataContainer.appendChild(p);       // Append the <p> element to the div
+          });
+            //dataContainer.innerHTML = `<p>${data}</p>`;;
+        })
+        .catch(error => {
+            console.error('There was a problem with the fetch operation:', error);
+        });
+
+})
 
 // Function to handle PDF download
 function downloadPDF(element) {

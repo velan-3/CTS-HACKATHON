@@ -21,7 +21,6 @@ class Model:
         #self.summarization()
         self.embedding  = None
         self.vectordbl = None
-        #self.preprocesspdf()
         
     def pdfprocessing(self,pdf_filename):
         file_path = os.path.join('./upload', pdf_filename)
@@ -31,23 +30,14 @@ class Model:
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=5000, chunk_overlap=300)
         texts = text_splitter.split_documents(documents)
         print("document splitted")
-        #persist_directory = 'db'
         #global embedding
         self.embedding = HuggingFaceEmbeddings()
         print("Embedding done")
         self.vectordbl = Chroma.from_documents(documents=texts, embedding=self.embedding)
         print("storage done")
-        #self.vectordbl.persist()
         print("DB storage done")
         
     def summarization(self):
-        #global embedding
-        #embeddings = HuggingFaceEmbeddings()
-        
-        # persist_directory = 'db'
-        # self.vectordbl = Chroma(persist_directory=persist_directory, 
-        #             embedding_function=self.embedding)
-        #done
         llm = HuggingFaceHub(repo_id='mistralai/Mistral-7B-Instruct-v0.2',model_kwargs={'temperature':0.1,'max_new_tokens':6000})
         global input
         input = "Provide a detailed analysis and summarization of complete Blood count, Liver tests, Kidney tests, Cholesterol tests from the report."
@@ -128,24 +118,15 @@ Question: {input}
         
     def Extraction(self,query,context):
         print('Loading db')
-        #persist_directory = 'db'
         print("Query")
         llm = HuggingFaceHub(repo_id='mistralai/Mistral-7B-Instruct-v0.2',model_kwargs={'temperature':0.1,'max_new_tokens':1000})
         input = query
         document = Document(page_content=context, metadata={})
-        #self.embedding = HuggingFaceEmbeddings()
-        #vectordb = Chroma(persist_directory=persist_directory, 
-        #           embedding_function=self.embedding)
         prompt = ChatPromptTemplate.from_template("""
         You are a medical professional analyzing patient's medical lab reports which contains test details about complete blood count,liver tests,kidney tests and cholesterol test. Your task is to provide the answer for the user's query based on the provided context
         Context: {context}
         Question: {input}""")
         chain = create_stuff_documents_chain(llm=llm,prompt=prompt)
-        #retriever = vectordb.as_retriever()
-        # retreival_chain = create_retrieval_chain(
-        #     retriever,
-        #     chain
-        # )
         response = chain.invoke({
             "input": input,
             "context": [document]
@@ -162,4 +143,39 @@ Question: {input}
             return extracted_wordings[0]
         else:
             print("No answers or questions found.")
+            return 'Query processing is done'
+
+    def Consultation(self,context):
+        print('Loading db')
+        print("Query")
+        llm = HuggingFaceHub(repo_id='mistralai/Mistral-7B-Instruct-v0.2',model_kwargs={'temperature':0.9,'max_new_tokens':1000})
+        print(context)
+        input = "based on the patient's test levels recommend top 5 medicines for the treatment(give only the medicine names(with mg) no extra explanations) "
+        document = Document(page_content=context, metadata={})
+        prompt = ChatPromptTemplate.from_template("""
+        You are a medical professional analyzing patient's medical lab report details. Your task is to provide the answer for the doctor's query based on the provided context
+        Context: {context}
+        Question: {input}""")
+        chain = create_stuff_documents_chain(llm=llm,prompt=prompt)
+        response = chain.invoke({
+            "input": input,
+            "context": [document]
+        })
+        text = response
+        print(text)
+        endings = [r'\bPlease\b', r'\bHowever\b', r'\bNote\b']
+
+# Create a regular expression that matches the text after 'Answer:' and stops at any of the ending phrases
+        endings_pattern = "|".join(endings)
+        answer_pattern = re.compile(fr'Answer:\s*(.*?)(?={endings_pattern}|$)', re.DOTALL)
+        # Extract the matching text
+        extracted_wordings = []
+        match = answer_pattern.search(text)
+        if match:
+            extracted_wordings.append(match.group(1).strip())  # Strip to remove leading/trailing whitespace
+
+        if extracted_wordings:
+            return extracted_wordings[0]
+        else:
+            print("No medications section found.")
             return 'Query processing is done'

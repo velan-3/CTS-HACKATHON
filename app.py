@@ -355,6 +355,7 @@ def process_query():
 
 @app.route('/prediction')
 def prediction():
+    
     global blood_test_results, liver_function_test_results
     global cholesterol_test_results, kidney_test_results
     global gender,age
@@ -540,5 +541,17 @@ def prediction():
         })
     #done
     return jsonify(prediction_details), 200
+
+@app.route('/consultation')
+def consultation():
+    global blood_test_results, liver_function_test_results
+    global cholesterol_test_results, kidney_test_results
+    global summaries_cache,uploaded_filename
+    if not (blood_test_results and liver_function_test_results and cholesterol_test_results and kidney_test_results):
+        return jsonify({'error': 'Test results are not available'}), 200
+    model = Model()
+    data = model.Consultation(summaries_cache[uploaded_filename])
+    return jsonify(data),200
+
 if __name__ == "__main__":
     app.run(debug=False)

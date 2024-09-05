@@ -43,7 +43,7 @@ class Model:
     def summarization(self):
         #global embedding
         #embeddings = HuggingFaceEmbeddings()
-        print('Loading db')
+        
         # persist_directory = 'db'
         # self.vectordbl = Chroma(persist_directory=persist_directory, 
         #             embedding_function=self.embedding)

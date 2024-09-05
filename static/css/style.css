@@ -1210,3 +1210,55 @@ canvas {
 .prediction-btn:hover {
   background-color: #0056b3;
 }
+
+
+/* Consultation */
+/* Styling for the consultation section */
+.consultation_container {
+  background-color: #f9f9f9;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  margin-top: 35px;
+}
+
+/* Left side (illustration) */
+.consultation_left {
+  flex: 1;
+}
+
+.consultation_left img {
+  height: 500px;
+  padding: 20px 50px;
+}
+
+/* Right side (prescription details) */
+.consultation_right {
+  flex: 1;
+  padding: 20px;
+  background-color: #fff;
+  position: relative;
+  border-radius: 1px; 
+  box-shadow: 6px 6px var(--black-color);
+  margin: 0 30px;
+  padding: 30px;
+  height: 400px;
+  background-image: url('../images/paper.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 110%;
+  border: 2px solid var(--black-color);
+}
+
+.consultation_right h1,
+.consultation_right h3 {
+  margin-top: 0;
+}
+
+.consultation_right p {
+  margin: 10px 0;
+}

@@ -505,41 +505,80 @@ def prediction():
     print(kidney_disease)
     prediction_details = []
     if anemia_disease=="Anemia":
-        prediction_details.append({
+        if gender_value ==1:
+            prediction_details.append({
             "organ": "Blood",
             "disease": "Anemia",
-            "image": "static/images/brain-male.jpg",
+            "image": "static/images/male-liver.png",
+            "description": "Anemia is a condition in which you lack enough healthy red blood cells to carry adequate oxygen to your body's tissues."
+        })
+        else:
+            prediction_details.append({
+            "organ": "Blood",
+            "disease": "Anemia",
+            "image": "static/images/female-liver.png",
             "description": "Anemia is a condition in which you lack enough healthy red blood cells to carry adequate oxygen to your body's tissues."
         })
     if hepatitis_disease == "Hepatitis":
-        prediction_details.append({
+        if gender_value==1:
+            prediction_details.append({
             "organ": "Liver",
             "disease": "Hepatitis",
-            "image": "static/images/lung-male.jpg",
+            "image": "static/images/male-citrhosis.png",
+            "description": "Hepatitis is an inflammation of the liver, commonly caused by a viral infection."
+        })
+        else:
+            prediction_details.append({
+            "organ": "Liver",
+            "disease": "Hepatitis",
+            "image": "static/images/female-citrhosis.png",
             "description": "Hepatitis is an inflammation of the liver, commonly caused by a viral infection."
         })
     if cirhossis_disease=="YES":
-        prediction_details.append({
+        if gender_value==1:
+            prediction_details.append({
             "organ": "Liver",
             "disease": "Cirrhosis",
-            "image": "static/images/brain-male.jpg",
+            "image": "static/images/male-citrhosis.png",
+            "description": "Cirrhosis is a late stage of scarring (fibrosis) of the liver caused by many forms of liver diseases and conditions."
+        })
+        else:
+            prediction_details.append({
+            "organ": "Liver",
+            "disease": "Cirrhosis",
+            "image": "static/images/female-citrhosis.png",
             "description": "Cirrhosis is a late stage of scarring (fibrosis) of the liver caused by many forms of liver diseases and conditions."
         })
     if kidney_disease=="ckd":
-        prediction_details.append({
+        if gender_value==1:
+            prediction_details.append({
             "organ": "Kidney",
             "disease": "Chronic Kidney Disease",
-            "image": "static/images/heart-male.jpg",
+            "image": "static/images/male-kidney.png",
+            "description": "Chronic kidney disease (CKD) is a long-term condition where the kidneys don't work as well as they should."
+        })
+        else:
+            prediction_details.append({
+            "organ": "Kidney",
+            "disease": "Chronic Kidney Disease",
+            "image": "static/images/female-kidney.png",
             "description": "Chronic kidney disease (CKD) is a long-term condition where the kidneys don't work as well as they should."
         })
     if liver_disease=="Liver Disease":
-        prediction_details.append({
+        if gender_value==1:
+            prediction_details.append({
             "organ": "Liver",
             "disease": "Liver Disease",
-            "image": "static/images/lung-female.jpg",
+            "image": "static/images/male-liver.png",
             "description": "Liver disease refers to any condition that impairs the liver's ability to function properly."
         })
-    #done
+        else:
+            prediction_details.append({
+            "organ": "Liver",
+            "disease": "Liver Disease",
+            "image": "static/images/female-liver.png",
+            "description": "Liver disease refers to any condition that impairs the liver's ability to function properly."
+        })
     return jsonify(prediction_details), 200
 
 @app.route('/consultation')

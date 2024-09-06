@@ -150,12 +150,15 @@ Question: {input}
         print("Query")
         llm = HuggingFaceHub(repo_id='mistralai/Mistral-7B-Instruct-v0.2',model_kwargs={'temperature':0.9,'max_new_tokens':1000})
         print(context)
-        input = "based on the patient's test levels recommend top 5 medicines for the treatment(give only the medicine names(with mg) no extra explanations) "
+        input = "Based on the patient's test results, please recommend the top 5 medicines for treatment. Provide only the names of the medicines along with their dosage in mg. Do not include any additional explanations or details."
         document = Document(page_content=context, metadata={})
         prompt = ChatPromptTemplate.from_template("""
-        You are a medical professional analyzing patient's medical lab report details. Your task is to provide the answer for the doctor's query based on the provided context
+        You are a medical professional tasked with analyzing a patient's medical lab report details and recommending appropriate medications. Your goal is to respond to the doctor's query based on the provided context.
+        Please provide your answer in the following format:
+        1. [Medicine Name] - [Dosage in mg]
         Context: {context}
         Question: {input}""")
+
         chain = create_stuff_documents_chain(llm=llm,prompt=prompt)
         response = chain.invoke({
             "input": input,

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authority Selection & Login</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}" />
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600&display=swap" rel="stylesheet" />
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
+</head>
+
+<body>
+    <img class="wave" src="{{ url_for('static', filename='images/wave2.png') }}" />
+    <div class="container">
+        <div class="img">
+            <img src="{{ url_for('static', filename='images/bg.png') }}" />
+        </div>
+        <div class="login-content">
+            <!-- Step 1: Authority Selection -->
+            <div id="authority-choice" class="authority-choice">
+                <img src="{{ url_for('static', filename='images/avatar.jpg') }}" class="avatar" />
+                <h2 class="title">Choose Your Authority</h2>
+                <div class="button-container">
+                    <button class="btn" id="doctor-login-btn">Doctor Login</button>
+                    <button class="btn" id="admin-login-btn">Admin Login</button>
+                </div>
+            </div>
+
+            <!-- Step 2: User ID Input for Doctor (Initially Hidden) -->
+            <form id="doctor-id-form" style="display: none;">
+                <img src="{{ url_for('static', filename='images/avatar.jpg') }}" class="avatar" />
+                <h2 class="title">Enter Doctor ID</h2>
+                <div class="input-div one">
+                    <div class="i">
+                        <i class="bx bx-user"></i>
+                    </div>
+                    <div class="div">
+                        <input type="text" class="input" id="doctor-id" placeholder=" " required />
+                        <h5>Doctor ID</h5>
+                    </div>
+                </div>
+                <p id="doctor-id-error-message" style="color: red; display: none;">Incorrect Doctor ID.</p>
+                <input type="button" class="btn" value="Next" id="doctor-next-btn" />
+            </form>
+
+            <!-- Step 2: User ID Input for Admin (Initially Hidden) -->
+            <form id="admin-id-form" style="display: none;">
+                <img src="{{ url_for('static', filename='images/avatar.jpg') }}" class="avatar" />
+                <h2 class="title">Enter Admin ID</h2>
+                <div class="input-div one">
+                    <div class="i">
+                        <i class="bx bx-user"></i>
+                    </div>
+                    <div class="div">
+                        <input type="text" class="input" id="admin-id" placeholder=" " required />
+                        <h5>Admin ID</h5>
+                    </div>
+                </div>
+                <p id="admin-id-error-message" style="color: red; display: none;">Incorrect Admin ID.</p>
+                <input type="button" class="btn" value="Next" id="admin-next-btn" />
+            </form>
+
+            <!-- Step 3: Password Input for Doctor (Initially Hidden) -->
+            <form id="doctor-password-form" style="display: none;">
+                <img src="{{ url_for('static', filename='images/avatar.jpg') }}" class="avatar" />
+                <h2 class="title">Doctor Password</h2>
+                <div class="input-div pass">
+                    <div class="i">
+                        <i class="bx bx-lock"></i>
+                    </div>
+                    <div class="div">
+                        <input type="password" class="input" id="doctor-password" placeholder=" " required />
+                        <h5>Password</h5>
+                    </div>
+                </div>
+                <p id="doctor-password-error-message" style="color: red; display: none;">Incorrect password.</p>
+                <input type="button" class="btn" value="Login" id="doctor-pass-btn" />
+            </form>
+
+            <!-- Step 3: Password Input for Admin (Initially Hidden) -->
+            <form id="admin-password-form" style="display: none;">
+                <img src="{{ url_for('static', filename='images/avatar.jpg') }}" class="avatar" />
+                <h2 class="title">Admin Password</h2>
+                <div class="input-div pass">
+                    <div class="i">
+                        <i class="bx bx-lock"></i>
+                    </div>
+                    <div class="div">
+                        <input type="password" class="input" id="admin-password" placeholder=" " required />
+                        <h5>Password</h5>
+                    </div>
+                </div>
+                <p id="admin-password-error-message" style="color: red; display: none;">Incorrect password.</p>
+                <input type="button" class="btn" value="Login" id="admin-pass-btn" />
+            </form>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+
+</html>

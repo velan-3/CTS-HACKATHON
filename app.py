@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, send_file, session
+from flask import Flask, redirect, render_template, request, jsonify, url_for
 from werkzeug.utils import secure_filename
 from model import Model
 import os, re, shutil
@@ -6,6 +6,7 @@ from flask_cors import CORS
 import pickle
 import pandas as pd
 import numpy as np
+from pymongo import MongoClient
 
 
 app = Flask(__name__)
@@ -22,17 +23,111 @@ kidney_test_results = {}
 liver_function_test_results = {}
 cholesterol_test_results = {}
 global gender,age
+uri = "mongodb+srv://anupriyaravi2020:anu1803@cluster0.cl1fywz.mongodb.net/?retryWrites=true&w=majority"
+client = MongoClient(uri)
+db = client['doctorDB']
+doctor_collection = db['doctors']
+admin_collection = db['admins']
+try:
+    client.admin.command('ping')
+    print("MongoDB connected successfully.")
+except Exception as e:
+    print("Error connecting to MongoDB:", e)
 
 
+    
 @app.route("/")
 def index():
-    return render_template("index.html", title="My Flask Website with Images")
+    return render_template("login.html", title="Login Page")
+
+@app.route("/home")
+def home():
+    return render_template("index.html",title = "Home Page")
+
+@app.route('/verify_id', methods=['POST'])
+def verify_id():
+    data = request.get_json()
+    user_id = data.get('userId')
+    user_type = data.get('userType')
+
+    try:
+        if user_type == 'doctor':
+            # Check if doctor exists
+            doctor = doctor_collection.find_one({"doctorId": user_id})
+
+            if not doctor:
+                return jsonify({"success": False, "message": "Doctor ID not found."}), 404
+            return jsonify({"success": True, "name": doctor.get('doctorName')}), 200
+
+        elif user_type == 'admin':
+            # Check if admin exists
+            admin = admin_collection.find_one({"adminId": user_id})
+
+            if not admin:
+                return jsonify({"success": False, "message": "Admin ID not found."}), 404
+            return jsonify({"success": True, "name": admin.get('name')}), 200
+
+        else:
+            return jsonify({"success": False, "message": "Invalid user type."}), 400
+
+    except Exception as e:
+        print("Error during ID verification:", str(e))
+        return jsonify({"success": False, "message": "Server error. Please try again later."}), 500
+
+@app.route('/verify_password', methods=['POST'])
+def verify_password():
+    data = request.get_json()
+    user_id = data.get('userId')
+    password = data.get('password')
+    user_type = data.get('userType')
+
+    try:
+        if user_type == 'doctor':
+            # Verify doctor's password
+            doctor = doctor_collection.find_one({"doctorId": user_id})
+
+            if not doctor:
+                return jsonify({"success": False, "message": "Doctor ID not found."}), 404
+
+            if doctor.get('password') == password:
+                print("Doctor password verified successfully")
+                return jsonify({"success": True, "redirect_url": url_for('home')}), 200
+            else:
+                return jsonify({"success": False, "message": "Incorrect password."}), 401
+
+        elif user_type == 'admin':
+            # Verify admin's password
+            admin = admin_collection.find_one({"adminId": user_id})
+
+            if not admin:
+                return jsonify({"success": False, "message": "Admin ID not found."}), 404
+
+            if admin.get('password') == password:
+                print("Admin password verified successfully")
+                return jsonify({"success": True, "redirect_url": url_for('home')}), 200
+            else:
+                return jsonify({"success": False, "message": "Incorrect password."}), 401
+
+        else:
+            return jsonify({"success": False, "message": "Invalid user type."}), 400
+
+    except Exception as e:
+        print("Error during password verification:", str(e))
+        return jsonify({"success": False, "message": "Server error. Please try again later."}), 500
 
 
 @app.route("/upload", methods=["POST"])
 def upload_file():
     global uploaded_filename
+    global blood_test_results, liver_function_test_results
+    global cholesterol_test_results, kidney_test_results
+    global summaries_cache
     delete_all_files_in_folder("./upload")
+    blood_test_results = None
+    kidney_test_results = None
+    liver_function_test_results = None
+    cholesterol_test_results = None
+    summaries_cache[uploaded_filename] = None
     if "pdf" not in request.files:
         return jsonify({"error": "No file part"}), 400
 

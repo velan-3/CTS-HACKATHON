@@ -165,17 +165,21 @@ Question: {input}
             "context": [document]
         })
         text = response
-        print(text)
-        endings = [r'\bPlease\b', r'\bHowever\b', r'\bNote\b']
-
-# Create a regular expression that matches the text after 'Answer:' and stops at any of the ending phrases
-        endings_pattern = "|".join(endings)
-        answer_pattern = re.compile(fr'Answer:\s*(.*?)(?={endings_pattern}|$)', re.DOTALL)
+        answer_pattern1 = re.compile(r'(?:My answer:|Answer:)\s*(.*)', re.DOTALL)
+        answer_pattern = re.compile(r'1\..*?5\..*?(?=\n|Note:)', re.DOTALL)
         # Extract the matching text
+        etext=''
+        match1 = answer_pattern1.search(text)
+        if match1:
+            etext = match1.group(0).strip()  # Strip to remove leading/trailing whitespace
+            print(etext)
+        else:
+            print("No relevant section found.")
+            
         extracted_wordings = []
-        match = answer_pattern.search(text)
+        match = answer_pattern.search(etext)
         if match:
-            extracted_wordings.append(match.group(1).strip())  # Strip to remove leading/trailing whitespace
+            extracted_wordings.append(match.group(0).strip())  # Strip to remove leading/trailing whitespace
 
         if extracted_wordings:
             return extracted_wordings[0]

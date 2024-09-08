@@ -123,11 +123,12 @@ def upload_file():
     global cholesterol_test_results, kidney_test_results
     global summaries_cache
     delete_all_files_in_folder("./upload")
-    blood_test_results = None
-    kidney_test_results = None
-    liver_function_test_results = None
-    cholesterol_test_results = None
+    blood_test_results.clear
+    kidney_test_results.clear
+    liver_function_test_results.clear
+    cholesterol_test_results.clear
     summaries_cache[uploaded_filename] = None
+    uploaded_filename = None
     if "pdf" not in request.files:
         return jsonify({"error": "No file part"}), 400
 

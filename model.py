@@ -149,7 +149,7 @@ Question: {input}
         print('Loading db')
         print("Query")
         llm = HuggingFaceHub(repo_id='mistralai/Mistral-7B-Instruct-v0.2',model_kwargs={'temperature':0.9,'max_new_tokens':1000})
-        print(context)
+        # print(context)
         input = "Based on the patient's test results, please recommend the top 5 medicines for treatment. Provide only the names of the medicines along with their dosage in mg. Do not include any additional explanations or details."
         document = Document(page_content=context, metadata={})
         prompt = ChatPromptTemplate.from_template("""
@@ -165,24 +165,40 @@ Question: {input}
             "context": [document]
         })
         text = response
-        answer_pattern1 = re.compile(r'(?:My answer:|Answer:)\s*(.*)', re.DOTALL)
-        answer_pattern = re.compile(r'1\..*?5\..*?(?=\n|Note:)', re.DOTALL)
+        print(text)
+        answer_pattern1 = re.compile(r'(?:My answer:|Answer:|Question:)\s*(.*)', re.DOTALL)
+        answer_pattern = re.compile(
+    r'(\d+)\.\s*([^\d]+?)\s*-\s*(\d+ mg)', 
+    re.IGNORECASE
+)
+
         # Extract the matching text
         etext=''
         match1 = answer_pattern1.search(text)
         if match1:
-            etext = match1.group(0).strip()  # Strip to remove leading/trailing whitespace
+            etext = match1.group(1).strip()  # Strip to remove leading/trailing whitespace
             print(etext)
         else:
             print("No relevant section found.")
             
         extracted_wordings = []
-        match = answer_pattern.search(etext)
-        if match:
-            extracted_wordings.append(match.group(0).strip())  # Strip to remove leading/trailing whitespace
+        lines = etext.split('\n')
+        aligned_lines = [line.strip() for line in lines if line.strip()]
+
+        # Join the lines back into a single string
+        normalized_text = '\n'.join(aligned_lines)
+        # extracted_wordings = []
+        matches = answer_pattern.findall(normalized_text)
+
+        for match in matches:
+            index, medicine_name, dosage = match
+            extracted_wordings.append(f"{index}. {medicine_name.strip()} - {dosage.strip()}")
 
         if extracted_wordings:
-            return extracted_wordings[0]
+    # Join the results into a single string for easier return/output
+            extracted_result = '\n'.join(extracted_wordings)
+            print(extracted_result)
+            return extracted_result
         else:
             print("No medications section found.")
             return 'Query processing is done'

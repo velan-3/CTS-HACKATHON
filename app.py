@@ -59,14 +59,6 @@ def verify_id():
                 return jsonify({"success": False, "message": "Doctor ID not found."}), 404
             return jsonify({"success": True, "name": doctor.get('doctorName')}), 200
 
-        elif user_type == 'admin':
-            # Check if admin exists
-            admin = admin_collection.find_one({"adminId": user_id})
-
-            if not admin:
-                return jsonify({"success": False, "message": "Admin ID not found."}), 404
-            return jsonify({"success": True, "name": admin.get('name')}), 200
-
         else:
             return jsonify({"success": False, "message": "Invalid user type."}), 400
 
@@ -91,19 +83,6 @@ def verify_password():
 
             if doctor.get('password') == password:
                 print("Doctor password verified successfully")
-                return jsonify({"success": True, "redirect_url": url_for('home')}), 200
-            else:
-                return jsonify({"success": False, "message": "Incorrect password."}), 401
-
-        elif user_type == 'admin':
-            # Verify admin's password
-            admin = admin_collection.find_one({"adminId": user_id})
-
-            if not admin:
-                return jsonify({"success": False, "message": "Admin ID not found."}), 404
-
-            if admin.get('password') == password:
-                print("Admin password verified successfully")
                 return jsonify({"success": True, "redirect_url": url_for('home')}), 200
             else:
                 return jsonify({"success": False, "message": "Incorrect password."}), 401

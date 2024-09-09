@@ -411,43 +411,50 @@ function displayPDF(pdfData) {
 
 // JavaScript to handle the search functionality
 document.getElementById("searchBtn").addEventListener("click", function () {
-
   const searchQuery = document.getElementById('searchQuery').value;
 
+  // Show the loader
+  document.getElementById("loader").style.display = "block";
 
-    // Send the search query to the Flask backend
-    fetch('/process-query', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ query: searchQuery })
-    })
-    .then(response => response.json())
-    .then(data => {
-        // Display the result in the searchResults div
-        var resultsDiv = document.getElementById("searchResults");
+  // Hide search results while loading
+  document.getElementById("searchResults").style.display = "none";
 
-        // Clear previous result
-        resultsDiv.innerHTML = "";
+  // Send the search query to the Flask backend
+  fetch('/process-query', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ query: searchQuery })
+  })
+  .then(response => response.json())
+  .then(data => {
+    // Hide the loader when data is received
+    document.getElementById("loader").style.display = "none";
 
-        // Add a container for the typewriter effect
-        var resultText = document.createElement("p");
-        resultText.classList.add("typewriter-text"); // Add class for styling
-        resultsDiv.appendChild(resultText);
+    // Display the result in the searchResults div
+    var resultsDiv = document.getElementById("searchResults");
 
-        const answer = data.result; 
-        // Start typewriter effect
-        typeWriter(answer, resultText);
+    // Clear previous result
+    resultsDiv.innerHTML = "";
 
-        // Display the results div
-        resultsDiv.style.display = "block";
-    })
-    .catch(error => {
-        console.error('Error:', error);
-    });
-  
-  
+    // Add a container for the typewriter effect
+    var resultText = document.createElement("p");
+    resultText.classList.add("typewriter-text"); // Add class for styling
+    resultsDiv.appendChild(resultText);
+
+    const answer = data.result; 
+    // Start typewriter effect
+    typeWriter(answer, resultText);
+
+    // Display the results div
+    resultsDiv.style.display = "block";
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    // Hide the loader in case of an error
+    document.getElementById("loader").style.display = "none";
+  });
 });
 
 
@@ -502,62 +509,4 @@ document.getElementById('changePredictionBtn').addEventListener('click', functio
       updatePredictionUI(cachedPredictions); // Update UI with a new prediction from the cached data
   }
 });
-
-// // Prediction section
-// function changePrediction() {
-//   const predictions = [
-//       { 
-//           organ: 'Lung', 
-//           disease: 'Pneumonia', 
-//           image: 'static/images/lung-male.jpg', 
-//           description: 'Pneumonia is an infection that inflames the air sacs in one or both lungs, which may fill with fluid.' 
-//       },
-//       { 
-//           organ: 'Heart', 
-//           disease: 'Myocardial Infarction', 
-//           image: 'static/images/heart-male.jpg', 
-//           description: 'Myocardial infarction, commonly known as a heart attack, occurs when blood flow decreases or stops to a part of the heart, causing damage to the heart muscle.' 
-//       },
-//       { 
-//           organ: 'Brain', 
-//           disease: 'Stroke', 
-//           image: 'static/images/brain-male.jpg', 
-//           description: 'A stroke occurs when the blood supply to part of the brain is interrupted or reduced, preventing brain tissue from getting oxygen and nutrients.' 
-//       },
-//       { 
-//           organ: 'Lung', 
-//           disease: 'Pneumonia', 
-//           image: 'static/images/lung-female.jpg', 
-//           description: 'Pneumonia is an infection that inflames the air sacs in one or both lungs, which may fill with fluid.' 
-//       },
-//       { 
-//           organ: 'Heart', 
-//           disease: 'Myocardial Infarction', 
-//           image: 'static/images/heart-female.jpg', 
-//           description: 'Myocardial infarction, commonly known as a heart attack, occurs when blood flow decreases or stops to a part of the heart, causing damage to the heart muscle.' 
-//       },
-//       { 
-//           organ: 'Brain', 
-//           disease: 'Stroke', 
-//           image: 'static/images/brain-female.jpg', 
-//           description: 'A stroke occurs when the blood supply to part of the brain is interrupted or reduced, preventing brain tissue from getting oxygen and nutrients.' 
-//       }
-//   ];
-
-//   // Randomly select a prediction
-//   const randomIndex = Math.floor(Math.random() * predictions.length);
-//   const prediction = predictions[randomIndex];
-
-//   // Update the image and prediction details
-//   document.getElementById('prediction-image').src = prediction.image;
-//   document.getElementById('predicted-organ').innerText = `Predicted Organ: ${prediction.organ}`;
-//   document.getElementById('predicted-disease').innerText = `Predicted Disease: ${prediction.disease}`;
-//   document.getElementById('disease-description').innerText = prediction.description;
-// }
-
-// // Add an event listener to the button to trigger the function
-// document.getElementById('changePredictionBtn').addEventListener('click', changePrediction);
-
-
-
 

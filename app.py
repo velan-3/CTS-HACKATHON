@@ -44,6 +44,11 @@ def index():
 def home():
     return render_template("index.html",title = "Home Page")
 
+@app.route('/logout')
+def logout():
+    # Redirect to login page
+    return redirect(url_for('index'))
+
 @app.route('/verify_id', methods=['POST'])
 def verify_id():
     data = request.get_json()

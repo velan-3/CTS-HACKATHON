@@ -162,7 +162,7 @@ form {
 
 .input-div .input:focus~h5,
 .input-div .input:not(:placeholder-shown)~h5 {
-    top: -20px;
+    top: -8px;
     font-size: 14px;
     color: var(--black-color);
 }

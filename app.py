@@ -589,14 +589,14 @@ def prediction():
             prediction_details.append({
             "organ": "Blood",
             "disease": "Anemia",
-            "image": "static/images/male-liver.png",
+            "image": "static/images/male-anemia.png",
             "description": "Anemia is a condition in which you lack enough healthy red blood cells to carry adequate oxygen to your body's tissues."
         })
         else:
             prediction_details.append({
             "organ": "Blood",
             "disease": "Anemia",
-            "image": "static/images/female-liver.png",
+            "image": "static/images/female-anemia.png",
             "description": "Anemia is a condition in which you lack enough healthy red blood cells to carry adequate oxygen to your body's tissues."
         })
     if hepatitis_disease == "Hepatitis":

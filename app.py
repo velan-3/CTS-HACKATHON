@@ -442,13 +442,13 @@ def prediction():
     if not (blood_test_results and liver_function_test_results and cholesterol_test_results and kidney_test_results):
         return jsonify({'error': 'Test results are not available'}), 200
     model_paths = {
-    "anemia": "mlmodel/Liver Disease/mlmodel/Liver Disease/saved_models/anemia_stacking_model.pkl",
-    "cirrhosis": "mlmodel/Liver Disease/mlmodel/Liver Disease/saved_models/cirrhosis_pipeline_model.pkl",
-    "hepatitis": "mlmodel/Liver Disease/mlmodel/Liver Disease/saved_models/hepatitis_stacking_model.pkl",
-    "liver": "mlmodel/Liver Disease/mlmodel/Liver Disease/saved_models/liver_stacking_model.pkl",
-    "kidney": "mlmodel/kidney Disease/saved_models/kidney_disease_model.pkl",
+    "anemia": "savedmodels/anemia_stacking_model.pkl",
+    "cirrhosis": "savedmodels/cirrhosis_pipeline_model.pkl",
+    "hepatitis": "savedmodels/hepatitis_stacking_model.pkl",
+    "liver": "savedmodels/liver_stacking_model.pkl",
+    "kidney": "savedmodels/kidney_disease_model.pkl",
 }
-    label_encoder_kidney = "mlmodel/kidney Disease/saved_models/label_encoders.pkl"
+    label_encoder_kidney = "savedmodels/label_encoders.pkl"
     with open(model_paths["anemia"], 'rb') as file:
         anemia_model = pickle.load(file)
     with open(model_paths["cirrhosis"], 'rb') as file:
@@ -461,7 +461,7 @@ def prediction():
         kidney_model = pickle.load(file)
     with open(label_encoder_kidney, 'rb') as file:
         kidney_label_encoder = pickle.load(file)
-    with open("D:/Projects/LLM Models/mlmodel/Liver Disease/mlmodel/Liver Disease/saved_models/scaler.pkl", 'rb') as model_file:
+    with open("savedmodels/stack.pkl", 'rb') as model_file:
         scaler = pickle.load(model_file)
         
     if gender=="Male" or gender=="M":

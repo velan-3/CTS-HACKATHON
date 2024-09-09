@@ -292,6 +292,10 @@ body.dark {
   color: var(--grey-color);
   width: 100%;
 }
+.bottom.logout i{
+  margin-left: 15px;
+}
+
 
 .sidebar.close .bottom_content {
   width: 50px;

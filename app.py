@@ -111,8 +111,6 @@ def upload_file():
     kidney_test_results.clear
     liver_function_test_results.clear
     cholesterol_test_results.clear
-    summaries_cache[uploaded_filename] = None
-    uploaded_filename = None
     if "pdf" not in request.files:
         return jsonify({"error": "No file part"}), 400
 

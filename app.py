@@ -12,7 +12,7 @@ from pymongo import MongoClient
 app = Flask(__name__)
 CORS(app)
 app.config["UPLOAD_FOLDER"] = "./upload"
-global summaries_cache
+global summaries_cache,file_path
 summaries_cache = {}
 global uploaded_filename
 uploaded_filename = None
@@ -102,7 +102,7 @@ def verify_password():
 
 @app.route("/upload", methods=["POST"])
 def upload_file():
-    global uploaded_filename
+    global uploaded_filename,file_path
     global blood_test_results, liver_function_test_results
     global cholesterol_test_results, kidney_test_results
     global summaries_cache
@@ -150,15 +150,16 @@ def summarize_pdf():
     global cholesterol_test_results, kidney_test_results
     global summaries_cache
     global gender,age
+    global file_path
     if uploaded_filename in summaries_cache:
         print("Returning cached summary")
         summary = summaries_cache[uploaded_filename]
         print(summary)
     else:
-        print(uploaded_filename)
+        print(file_path)
         model = Model()
         print("model executed")
-        model.pdfprocessing(uploaded_filename)
+        model.pdfprocessing(file_path)
         print("pdfprocessing done")
         model.summarization()
         print("summarization done")

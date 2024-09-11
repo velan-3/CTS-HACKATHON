@@ -23,8 +23,8 @@ class Model:
         self.vectordbl = None
         
     def pdfprocessing(self,pdf_filename):
-        file_path = os.path.join('./upload', pdf_filename)
-        loader = PyMuPDFLoader(file_path)
+        #file_path = os.path.join('./upload', pdf_filename)
+        loader = PyMuPDFLoader(pdf_filename)
         documents = loader.load()
         print("pdf loaded")
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=5000, chunk_overlap=300)

@@ -161,9 +161,8 @@ def summarize_pdf():
         print("model executed")
         model.pdfprocessing(file_path)
         print("pdfprocessing done")
-        model.summarization()
-        print("summarization done")
-        summary = model.run_retrieval()
+        print("summarizing the document")
+        summary = model.summarization()
         summaries_cache[uploaded_filename] = summary
         print(summary)
 
@@ -209,7 +208,7 @@ def summarize_pdf():
         "bilirubin_indirect": [r"Bilirubin Indirect",r"Serum Bilirubin \(Indirect\)"],
         "ALT": [r"ALT", r"Alanine Aminotransferase \(ALT\)",r"SGPT \(ALT\)"],
         "AST": [r"AST", r"Aspartate Aminotransferase \(AST\)",r"SGOT \(AST\)"],
-        "Alk": [r"Alkaline Phosphatase",r"Serum Alkaline Phosphatase"],
+        "Alk": [r"Alkaline Phosphatase",r"Serum Alkaline Phosphatase",r"Alkaline Phosphate"],
         "Protein": [r"Total Protein",r"Serum Protein",r"Protein, Total"],
         "Albumin": [r"Albumin",r"Serum Albumin"],
         "Globulin": [r"Globulin"],
@@ -227,8 +226,8 @@ def summarize_pdf():
     },
     "cholesterol": {
         "total_cholesterol": [r"Total Cholesterol"],
-        "hdl": [r"HDL Cholesterol"],
-        "ldl": [r"LDL Cholesterol"],
+        "hdl": [r"HDL Cholesterol",r"HDL"],
+        "ldl": [r"LDL Cholesterol",r"LDL"],
         "triglycerides": [r"Triglycerides"],
     },
         
@@ -672,4 +671,4 @@ def consultation():
     return jsonify(data),200
 
 if __name__ == "__main__":
-    app.run(debug=False,host="0.0.0.0",port=8000)
+    app.run(debug=False,port=8000)

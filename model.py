@@ -13,11 +13,12 @@ from langchain_core.documents import Document
 
 warnings.filterwarnings("ignore")
 
-
 class Model:
     
     def __init__(self):
-        os.environ['HUGGINGFACEHUB_API_TOKEN'] = "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"
+        # os.environ['HUGGINGFACEHUB_API_TOKEN'] = "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"
+        # os.environ['HUGGINGFACEHUB_API_TOKEN'] = "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"
+        os.environ['HUGGINGFACEHUB_API_TOKEN'] = "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"
         #self.summarization()
         self.embedding  = None
         self.vectordbl = None
@@ -38,8 +39,7 @@ class Model:
         print("DB storage done")
         
     def summarization(self):
-        llm = HuggingFaceHub(repo_id='mistralai/Mistral-7B-Instruct-v0.2',model_kwargs={'temperature':0.1,'max_new_tokens':6000})
-        global input
+        llm = HuggingFaceHub(repo_id='mistralai/Mistral-7B-Instruct-v0.3',model_kwargs={'temperature':0.1,'max_new_tokens':6000},huggingfacehub_api_token="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")
         input = "Provide a detailed analysis and summarization of complete Blood count, Liver tests, Kidney tests, Cholesterol tests from the report."
 
         prompt1 = ChatPromptTemplate.from_template("""
@@ -54,16 +54,16 @@ Provide the summarization in the following format:
     - Test Name: Specify all the tests names here. 
     
 3. Blood Test Results:
-    - Cover all relevant blood test results details (e.g., Haemoglobin, PCV, MCV, MCH, MCHC, RDW, Platelets, Differential Leucocyte Count, NLR) each point should be on a new line.
+    - Cover all relevant blood test results details with ranges (e.g., Haemoglobin, PCV, MCV, MCH, MCHC, RDW, Platelets, Differential Leucocyte Count, NLR) each point should be on a new line.
 
 4. Liver Function Test Results:
-    - Cover all relevant liver function test results details (e.g., Total Bilirubin, Bilirubin Direct, Bilirubin Indirect, ALT, AST, Alkaline Phosphate) each point on a new line.
+    - Cover all relevant liver function test results details with ranges (e.g., Total Bilirubin, Bilirubin Direct, Bilirubin Indirect, ALT, AST, Alkaline Phosphate) each point on a new line.
 
 5. Kidney Function Test Results:
-    - Cover all relevant kidney function test results details (e.g., Creatinine, Urea, Blood Urea Nitrogen, Calcium, Sodium, Potassium, Uric Acid, Chloride). Ensure each result is included and correctly interpreted. Each point should be on a new line.
+    - Cover all relevant kidney function test results details with ranges (e.g., Creatinine, Urea, Blood Urea Nitrogen, Calcium, Sodium, Potassium, Uric Acid, Chloride). Ensure each result is included and correctly interpreted. Each point should be on a new line.
 
 6. Cholesterol Test Results:
-    - Cover all relevant Cholesterol test results details (e.g., Total Cholesterol, Triglycerides, HDL, LDL).
+    - Cover all relevant Cholesterol test results details with ranges (e.g., Total Cholesterol, Triglycerides, HDL, LDL).
 
 7. Explanation:
     - Provide a brief summary of the test results and what they indicate about the patient's health (each point should be on a new line).
@@ -78,15 +78,11 @@ Question: {input}
 
         chain = create_stuff_documents_chain(llm=llm,prompt=prompt1)
         retriever = self.vectordbl.as_retriever()
-        global retreival_chain
         retreival_chain = create_retrieval_chain(
             retriever,
             chain
         )
-        return 'PDF process successfull'
-    def run_retrieval(self):
         print("document retreiving")
-        global input
         response = retreival_chain.invoke({
             "input": input,
         })
@@ -119,7 +115,7 @@ Question: {input}
     def Extraction(self,query,context):
         print('Loading db')
         print("Query")
-        llm = HuggingFaceHub(repo_id='mistralai/Mistral-7B-Instruct-v0.2',model_kwargs={'temperature':0.1,'max_new_tokens':1000})
+        llm = HuggingFaceHub(repo_id='mistralai/Mistral-7B-Instruct-v0.3',model_kwargs={'temperature':0.1,'max_new_tokens':1000})
         input = query
         document = Document(page_content=context, metadata={})
         prompt = ChatPromptTemplate.from_template("""
@@ -149,21 +145,24 @@ Question: {input}
         print('Loading db')
         print("Query")
         llm = HuggingFaceHub(repo_id='mistralai/Mistral-7B-Instruct-v0.2',model_kwargs={'temperature':0.9,'max_new_tokens':1000})
-        # print(context)
+        print(context)
         input = "Based on the patient's test results, please recommend the top 5 medicines for treatment. Provide only the names of the medicines along with their dosage in mg. Do not include any additional explanations or details."
         document = Document(page_content=context, metadata={})
+        print("document loaded")
         prompt = ChatPromptTemplate.from_template("""
         You are a medical professional tasked with analyzing a patient's medical lab report details and recommending appropriate medications. Your goal is to respond to the doctor's query based on the provided context.
         Please provide your answer in the following format:
         1. [Medicine Name] - [Dosage in mg]
         Context: {context}
         Question: {input}""")
-
+        print("prompt created")
         chain = create_stuff_documents_chain(llm=llm,prompt=prompt)
+        print("reaponse invoked")
         response = chain.invoke({
             "input": input,
             "context": [document]
         })
+        print("response done")
         text = response
         print(text)
         answer_pattern1 = re.compile(r'(?:My answer:|Answer:|Question:)\s*(.*)', re.DOTALL)

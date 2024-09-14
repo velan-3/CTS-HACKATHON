@@ -2,7 +2,7 @@ import os
 import re
 import warnings
 from langchain_huggingface  import HuggingFaceEmbeddings
-from langchain_community.vectorstores import Chroma
+from langchain_chroma import Chroma
 from langchain_community.llms.huggingface_hub import HuggingFaceHub
 from langchain.chains import create_retrieval_chain
 from langchain_core.prompts import ChatPromptTemplate
@@ -17,26 +17,30 @@ class Model:
     
     def __init__(self):
         os.environ['HUGGINGFACEHUB_API_TOKEN'] = "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"
-        #self.summarization()
-        self.embedding  = None
-        self.vectordbl = None
+
+
         
     def pdfprocessing(self,pdf_filename):
         #file_path = os.path.join('./upload', pdf_filename)
+        global vectordbl
         loader = PyMuPDFLoader(pdf_filename)
         documents = loader.load()
         print("pdf loaded")
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=5000, chunk_overlap=300)
         texts = text_splitter.split_documents(documents)
         print("document splitted")
-        #global embedding
-        self.embedding = HuggingFaceEmbeddings()
+        embedding = HuggingFaceEmbeddings()
         print("Embedding done")
-        self.vectordbl = Chroma.from_documents(documents=texts, embedding=self.embedding)
+        # vectordbl = Chroma.from_documents(documents=texts, embedding=embedding, persist_directory=None)
+        vectordbl = Chroma.from_documents(documents=texts, embedding=embedding,persist_directory=None)
+        #     print("Storage done")
+        # except Exception as e:
+        # print(f"Error during ChromaDB storage: {e}")
         print("storage done")
         print("DB storage done")
         
     def summarization(self):
+        global vectordbl
         llm = HuggingFaceHub(repo_id='mistralai/Mistral-7B-Instruct-v0.3',model_kwargs={'temperature':0.1,'max_new_tokens':6000},huggingfacehub_api_token="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")
         input = "Provide a detailed analysis and summarization of complete Blood count, Liver tests, Kidney tests, Cholesterol tests from the report."
 
@@ -75,7 +79,7 @@ Question: {input}
 """)
 
         chain = create_stuff_documents_chain(llm=llm,prompt=prompt1)
-        retriever = self.vectordbl.as_retriever()
+        retriever = vectordbl.as_retriever()
         retreival_chain = create_retrieval_chain(
             retriever,
             chain
@@ -86,9 +90,9 @@ Question: {input}
         })
         text = dict(response)
         print(text)
-        if self.vectordbl:
-            self.vectordbl.delete_collection()
-            self.vectordbl = None
+        if vectordbl:
+            vectordbl.delete_collection()
+            vectordbl = None
         answer_pattern = re.compile(r'Answer:\s*(.*)', re.DOTALL)
 
         question_pattern = re.compile(r'Question.*?\.\s*(.*)', re.DOTALL)

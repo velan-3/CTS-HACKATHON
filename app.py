@@ -107,6 +107,7 @@ def upload_file():
     global cholesterol_test_results, kidney_test_results
     global summaries_cache
     delete_all_files_in_folder("./upload")
+    delete_all_files_in_folder("./chroma_db")
     blood_test_results.clear
     kidney_test_results.clear
     liver_function_test_results.clear

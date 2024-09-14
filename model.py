@@ -16,8 +16,6 @@ warnings.filterwarnings("ignore")
 class Model:
     
     def __init__(self):
-        # os.environ['HUGGINGFACEHUB_API_TOKEN'] = "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"
-        # os.environ['HUGGINGFACEHUB_API_TOKEN'] = "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"
         os.environ['HUGGINGFACEHUB_API_TOKEN'] = "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"
         #self.summarization()
         self.embedding  = None
@@ -144,8 +142,8 @@ Question: {input}
     def Consultation(self,context):
         print('Loading db')
         print("Query")
-        llm = HuggingFaceHub(repo_id='mistralai/Mistral-7B-Instruct-v0.2',model_kwargs={'temperature':0.9,'max_new_tokens':1000})
-        print(context)
+        llm = HuggingFaceHub(repo_id='mistralai/Mistral-7B-Instruct-v0.3',model_kwargs={'temperature':0.9,'max_new_tokens':1000})
+        # print(context)
         input = "Based on the patient's test results, please recommend the top 5 medicines for treatment. Provide only the names of the medicines along with their dosage in mg. Do not include any additional explanations or details."
         document = Document(page_content=context, metadata={})
         print("document loaded")
@@ -164,10 +162,10 @@ Question: {input}
         })
         print("response done")
         text = response
-        print(text)
+        # print(text)
         answer_pattern1 = re.compile(r'(?:My answer:|Answer:|Question:)\s*(.*)', re.DOTALL)
         answer_pattern = re.compile(
-    r'(\d+)\.\s*([^\d]+?)\s*-\s*(\d+ mg)', 
+    r'(\d+\.)\s*(.*)',  # Capture the serial number and the rest of the line
     re.IGNORECASE
 )
 
@@ -184,19 +182,21 @@ Question: {input}
         lines = etext.split('\n')
         aligned_lines = [line.strip() for line in lines if line.strip()]
 
-        # Join the lines back into a single string
+    # Join the lines back into a single string
         normalized_text = '\n'.join(aligned_lines)
-        # extracted_wordings = []
+    
+    # Find all matches
         matches = answer_pattern.findall(normalized_text)
-
+    
+    # Process matches
         for match in matches:
-            index, medicine_name, dosage = match
-            extracted_wordings.append(f"{index}. {medicine_name.strip()} - {dosage.strip()}")
+            index, full_line = match
+            extracted_wordings.append(f"{index} {full_line.strip()}")
 
+    # Return the extracted result or a fallback message
         if extracted_wordings:
-    # Join the results into a single string for easier return/output
             extracted_result = '\n'.join(extracted_wordings)
-            print(extracted_result)
+        # print(extracted_result)  # For debug purposes
             return extracted_result
         else:
             print("No medications section found.")

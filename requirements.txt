@@ -3,7 +3,8 @@ transformers==4.44.1
 sentence_transformers==2.6.1
 huggingface-hub==0.24.5
 langchain-community==0.2.12
-chromadb==0.4.24
+chromadb
+langchain_chroma
 PyMuPDF==1.24.1
 flask_cors==4.0.1  # Specify a version for flask_cors
 flask==2.3.2        # Specify a version for flask

@@ -6,8 +6,8 @@ langchain-community==0.2.12
 chromadb
 langchain_chroma
 PyMuPDF==1.24.1
-flask_cors==4.0.1  # Specify a version for flask_cors
-flask==2.3.2        # Specify a version for flask
+flask_cors==4.0.1  
+flask==2.3.2        
 langchain-core==0.2.33
 langchain_huggingface==0.0.3
 Werkzeug==3.0.3

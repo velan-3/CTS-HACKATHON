@@ -17,8 +17,6 @@ class Model:
     
     def __init__(self):
         os.environ['HUGGINGFACEHUB_API_TOKEN'] = "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"
-
-
         
     def pdfprocessing(self,pdf_filename):
         #file_path = os.path.join('./upload', pdf_filename)

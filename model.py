@@ -19,7 +19,6 @@ class Model:
         os.environ['HUGGINGFACEHUB_API_TOKEN'] = "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"
         
     def pdfprocessing(self,pdf_filename):
-        #file_path = os.path.join('./upload', pdf_filename)
         global vectordbl
         loader = PyMuPDFLoader(pdf_filename)
         documents = loader.load()

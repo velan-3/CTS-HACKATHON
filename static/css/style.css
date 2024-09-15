@@ -1313,7 +1313,6 @@ canvas {
   padding: 10px; /* Padding inside fetched-data */
   /* background: rgba(255, 255, 255, 0.8); Optional: Semi-transparent background for readability */
   border-radius: 5px; /* Optional: Rounded corners */
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1); /* Optional: Subtle shadow */
   margin-top: 10px; /* Space above the fetched-data */
 }
 
